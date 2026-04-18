@@ -134,6 +134,165 @@ body {
   color: rgba(20, 48, 74, 0.82);
 }
 
+.event-card-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.event-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 240px;
+  padding: 24px;
+  border-radius: 28px;
+  border: 1px solid rgba(20, 48, 74, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 20px 45px rgba(20, 48, 74, 0.1);
+  color: #14304a;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.event-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.event-card:hover,
+.event-card:focus-visible {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 28px 60px rgba(20, 48, 74, 0.16);
+  border-color: rgba(15, 118, 110, 0.24);
+  outline: none;
+}
+
+.event-card:hover::before,
+.event-card:focus-visible::before {
+  opacity: 1;
+}
+
+.event-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.event-card-tag {
+  align-self: flex-start;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.event-card-media {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(20, 48, 74, 0.06);
+}
+
+.event-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.event-card h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+
+.event-card p {
+  margin: 0;
+  line-height: 1.7;
+  color: rgba(20, 48, 74, 0.82);
+}
+
+.event-card-cta {
+  margin-top: auto;
+  font-weight: 700;
+}
+
+.event-card-cta::after {
+  content: "->";
+  margin-left: 8px;
+  transition: margin-left 0.2s ease;
+}
+
+.event-card:hover .event-card-cta::after,
+.event-card:focus-visible .event-card-cta::after {
+  margin-left: 14px;
+}
+
+.event-card:hover .event-card-media img,
+.event-card:focus-visible .event-card-media img {
+  transform: scale(1.06);
+}
+
+.event-card-wedding {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 247, 244, 0.94));
+}
+
+.event-card-wedding::before {
+  background: radial-gradient(circle at top right, rgba(244, 114, 182, 0.18), transparent 42%);
+}
+
+.event-card-concert {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 249, 255, 0.94));
+}
+
+.event-card-concert::before {
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 42%);
+}
+
+.event-card-hackathon {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(236, 253, 245, 0.94));
+}
+
+.event-card-hackathon::before {
+  background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.2), transparent 42%);
+}
+
+.event-card-sports {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 251, 235, 0.94));
+}
+
+.event-card-sports::before {
+  background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.22), transparent 42%);
+}
+
+.event-card-seminar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(239, 246, 255, 0.94));
+}
+
+.event-card-seminar::before {
+  background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.16), transparent 42%);
+}
+
 @media (max-width: 920px) {
   .home-header {
     border-radius: 32px;
@@ -169,5 +328,9 @@ body {
   .nav-button {
     flex: 1 1 160px;
     text-align: center;
+  }
+
+  .event-card {
+    min-height: 220px;
   }
 }

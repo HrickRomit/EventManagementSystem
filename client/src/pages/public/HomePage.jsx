@@ -1,14 +1,16 @@
+import { Link } from "react-router-dom";
+
 function HomePage() {
   return (
     <main className="home-page">
       <header className="home-header">
-        <a className="brand-mark" href="#home">
+        <Link className="brand-mark" to="/">
           EventSphere
-        </a>
+        </Link>
 
         <nav className="home-nav" aria-label="Primary">
-          <a href="#home">Home</a>
-          <a href="#events">Events</a>
+          <Link to="/">Home</Link>
+          <Link to="/events">Events</Link>
           <a href="#how-it-works">How It Works</a>
           <a href="#about">About</a>
         </nav>
