@@ -1,0 +1,7 @@
+
+> server@1.0.0 start
+> node src/index.js
+
+◇ injected env (14) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+MongoDB connected: ac-sqz9ce9-shard-00-00.n7qczeh.mongodb.net
+Server running on http://localhost:5000
