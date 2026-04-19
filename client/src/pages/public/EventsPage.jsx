@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
 import weddingImage from "../../components/images/wedding.png";
+import concertImage from "../../components/images/concert.png";
+import hackathonImage from "../../components/images/hackathon.png";
+import sportsImage from "../../components/images/sports.png";
+import seminarImage from "../../components/images/seminar.png";
 
 function EventsPage() {
   const eventCategories = [
@@ -13,21 +17,25 @@ function EventsPage() {
     {
       name: "Concert",
       description: "Live music nights, ticketed crowds, and stage-ready production energy.",
+      image: concertImage,
       accentClass: "event-card-concert",
     },
     {
       name: "Hackathon",
       description: "Build, pitch, and collaborate through fast-paced innovation challenges.",
+      image: hackathonImage,
       accentClass: "event-card-hackathon",
     },
     {
       name: "Sports",
       description: "Tournament days, team matchups, and high-energy fan experiences.",
+      image: sportsImage,
       accentClass: "event-card-sports",
     },
     {
       name: "Seminar",
       description: "Speaker-led sessions, networking opportunities, and professional learning.",
+      image: seminarImage,
       accentClass: "event-card-seminar",
     },
   ];
@@ -42,7 +50,7 @@ function EventsPage() {
         <nav className="home-nav" aria-label="Primary">
           <Link to="/">Home</Link>
           <Link to="/events">Events</Link>
-          <a href="#how-it-works">How It Works</a>
+          <a href="#how-it-works">How We Operate</a>
           <a href="#about">About</a>
         </nav>
 

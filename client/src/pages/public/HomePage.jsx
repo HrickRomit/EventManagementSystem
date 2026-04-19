@@ -11,7 +11,7 @@ function HomePage() {
         <nav className="home-nav" aria-label="Primary">
           <Link to="/">Home</Link>
           <Link to="/events">Events</Link>
-          <a href="#how-it-works">How It Works</a>
+          <a href="#how-it-works">How We Operate</a>
           <a href="#about">About</a>
         </nav>
 
