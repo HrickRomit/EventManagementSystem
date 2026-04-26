@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Navbar from "../../components/navigation/Navbar";
 import weddingImage from "../../components/images/wedding.png";
 import concertImage from "../../components/images/concert.png";
 import hackathonImage from "../../components/images/hackathon.png";
@@ -178,27 +179,7 @@ function EventsPage() {
 
   return (
     <main className="home-page">
-      <header className="home-header">
-        <Link className="brand-mark" to="/">
-          EventSphere
-        </Link>
-
-        <nav className="home-nav" aria-label="Primary">
-          <Link to="/">Home</Link>
-          <Link to="/events">Events</Link>
-          <a href="#how-it-works">How We Operate</a>
-          <a href="#about">About</a>
-        </nav>
-
-        <div className="home-actions">
-          <a className="nav-button nav-button-secondary" href="#login">
-            Log In
-          </a>
-          <a className="nav-button nav-button-primary" href="#signup">
-            Get Started
-          </a>
-        </div>
-      </header>
+      <Navbar />
 
       <section className="hero-panel">
         <p className="hero-kicker">Explore upcoming experiences</p>
