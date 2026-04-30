@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getCurrentUser, login, register } from "../services/auth";
+import { getCurrentUser, login, loginAdmin, register } from "../services/auth";
 
 const TOKEN_KEY = "eventsphere-token";
 const USER_KEY = "eventsphere-user";
@@ -60,6 +60,12 @@ export function AuthProvider({ children }) {
     return authPayload;
   };
 
+  const loginAdminUser = async (payload) => {
+    const authPayload = await loginAdmin(payload);
+    persistSession(authPayload);
+    return authPayload;
+  };
+
   const registerUser = async (payload) => {
     const authPayload = await register(payload);
     persistSession(authPayload);
@@ -79,6 +85,7 @@ export function AuthProvider({ children }) {
         isLoading,
         isAuthenticated: Boolean(user),
         loginUser,
+        loginAdminUser,
         registerUser,
         logoutUser
       }}

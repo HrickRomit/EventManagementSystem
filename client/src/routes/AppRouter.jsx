@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import AdminRoute from "../components/auth/AdminRoute";
 import AuthRedirect from "../components/auth/AuthRedirect";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -14,6 +15,8 @@ import CreateEventPage from "../pages/organizer/CreateEventPage";
 import ParticipantDashboardPage from "../pages/participant/ParticipantDashboardPage";
 import ParticipantProfilePage from "../pages/participant/ParticipantProfilePage";
 import MyRegistrationsPage from "../pages/participant/MyRegistrationsPage";
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
+import ManageUsersPage from "../pages/admin/ManageUsersPage";
 
 function AppRouter() {
   return (
@@ -43,8 +46,19 @@ function AppRouter() {
           </Route>
         </Route>
       </Route>
+
+      <Route path="/admin" element={<AdminRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="users" element={<ManageUsersPage />} />
+        </Route>
+      </Route>
     </Routes>
   );
 }
+
+// export default AppRouter;
+//   );
+// }
 
 export default AppRouter;

@@ -1,6 +1,12 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+const roleHomePaths = {
+  admin: "/admin",
+  organizer: "/organizer",
+  participant: "/participant"
+};
+
 function ProtectedRoute({ allowedRoles }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
@@ -14,7 +20,7 @@ function ProtectedRoute({ allowedRoles }) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={user.role === "organizer" ? "/organizer" : "/participant"} replace />;
+    return <Navigate to={roleHomePaths[user.role] || "/participant"} replace />;
   }
 
   return <Outlet />;

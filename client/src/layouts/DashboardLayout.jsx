@@ -3,13 +3,14 @@ import RoleBadge from "../components/common/RoleBadge";
 import { useAuth } from "../context/AuthContext";
 import OrganizerSidebar from "../components/navigation/OrganizerSidebar";
 import ParticipantSidebar from "../components/navigation/ParticipantSidebar";
+import AdminSidebar from "../components/navigation/AdminSidebar";
 
 function DashboardLayout() {
   const { user, logoutUser } = useAuth();
 
   return (
     <main className="dashboard-shell">
-      {user.role === "organizer" ? <OrganizerSidebar /> : <ParticipantSidebar />}
+      {user.role === "admin" ? <AdminSidebar /> : user.role === "organizer" ? <OrganizerSidebar /> : <ParticipantSidebar />}
 
       <section className="dashboard-main">
         <header className="dashboard-topbar">

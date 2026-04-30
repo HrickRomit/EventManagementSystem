@@ -8,6 +8,11 @@ const roles = [
   { value: "organizer", label: "Organizer", description: "Create events and manage sign-ups." }
 ];
 
+const roleHomePaths = {
+  organizer: "/organizer",
+  participant: "/participant"
+};
+
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,8 +38,7 @@ function LoginPage() {
 
     try {
       const result = await loginUser(values);
-      const fallbackPath =
-        result.user.role === "organizer" ? "/organizer" : "/participant";
+      const fallbackPath = roleHomePaths[result.user.role] || "/participant";
       const redirectPath = location.state?.from?.pathname || fallbackPath;
       navigate(redirectPath, { replace: true });
     } catch (error) {

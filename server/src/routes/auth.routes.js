@@ -10,7 +10,8 @@ import { validateRequest } from "../middleware/validate.middleware.js";
 
 const router = Router();
 
-const allowedRoles = ["participant", "organizer"];
+const publicRegistrationRoles = ["participant", "organizer"];
+const loginRoles = ["participant", "organizer"];
 
 router.post(
   "/register",
@@ -21,7 +22,7 @@ router.post(
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters long."),
     body("role")
-      .isIn(allowedRoles)
+      .isIn(publicRegistrationRoles)
       .withMessage("Role must be participant or organizer."),
     body("organizationName")
       .optional({ values: "falsy" })
@@ -47,7 +48,7 @@ router.post(
     body("password").notEmpty().withMessage("Password is required."),
     body("role")
       .optional()
-      .isIn(allowedRoles)
+      .isIn(loginRoles)
       .withMessage("Role must be participant or organizer.")
   ],
   validateRequest,

@@ -19,4 +19,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Admin user management
+export const getAdminUsers = (role = null) => {
+  return api.get("/admin/users", { params: { role } });
+};
+
+export const updateAdminUser = (userId, userData) => {
+  return api.put(`/admin/users/${userId}`, userData);
+};
+
+export const deleteAdminUser = (userId) => {
+  return api.delete(`/admin/users/${userId}`);
+};
+
 export default api;
