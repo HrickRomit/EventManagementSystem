@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const organizerLinks = [
   { to: "/organizer", label: "Overview", end: true },
-  { to: "/organizer/events", label: "Manage Events" },
+  { to: "/organizer/events", label: "Manage Events", end: true },
   { to: "/organizer/events/new", label: "Create Event" }
 ];
 
