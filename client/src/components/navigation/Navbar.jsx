@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import logo from "../images/logo.png";
 
 function Navbar() {
   const { isAuthenticated, user, logoutUser } = useAuth();
@@ -7,7 +8,7 @@ function Navbar() {
   return (
     <header className="home-header">
       <Link className="brand-mark" to="/">
-        EventSphere
+        <img className="brand-logo" src={logo} alt="Eventsphere" />
       </Link>
 
       <nav className="home-nav" aria-label="Primary">

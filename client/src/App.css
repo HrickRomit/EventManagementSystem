@@ -48,12 +48,17 @@ body {
 }
 
 .brand-mark {
-  color: #0f766e;
   text-decoration: none;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.92rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.brand-logo {
+  display: block;
+  width: 200px;
+  max-width: 100%;
+  height: auto;
 }
 
 .home-nav {
