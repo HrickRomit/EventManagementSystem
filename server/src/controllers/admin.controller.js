@@ -12,6 +12,7 @@ const HARDCODED_ADMIN_USER = {
   role: "admin",
   organizationName: ""
 };
+const VALID_ROLES = ["participant", "organizer", "admin"];
 
 export const loginAdmin = async (req, res) => {
   const { username, password } = req.body;
@@ -31,7 +32,7 @@ export const getAllUsers = async (req, res) => {
     const { role } = req.query; // filter by role
     
     const filter = {};
-    if (role && ["participant", "organizer", "admin"].includes(role)) {
+    if (role && VALID_ROLES.includes(role)) {
       filter.role = role;
     }
 
@@ -51,16 +52,30 @@ export const updateUser = async (req, res) => {
     const { id } = req.params;
     const { name, email, role, organizationName } = req.body;
 
-    const updateData = { name, email, role };
-    if (role === "organizer") {
-      updateData.organizationName = organizationName;
+    if (!VALID_ROLES.includes(role)) {
+      return res.status(400).json({ message: "Invalid user role" });
     }
 
-    const user = await User.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    ).select("-password");
+    const existingUser = await User.findOne({
+      email: email.toLowerCase(),
+      _id: { $ne: id }
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: "An account with this email already exists" });
+    }
+
+    const updateData = {
+      name,
+      email,
+      role,
+      organizationName: role === "organizer" ? organizationName : ""
+    };
+
+    const user = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true
+    }).select("-password");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

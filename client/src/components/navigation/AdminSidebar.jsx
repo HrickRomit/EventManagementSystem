@@ -7,6 +7,7 @@ function AdminSidebar() {
       <nav className="dashboard-sidebar-nav">
         <NavLink
           to="/admin"
+          end
           className={({ isActive }) =>
             isActive
               ? "dashboard-sidebar-link dashboard-sidebar-link-active"
