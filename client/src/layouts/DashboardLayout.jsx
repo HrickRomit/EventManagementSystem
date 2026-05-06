@@ -4,35 +4,33 @@ import { useAuth } from "../context/AuthContext";
 import OrganizerSidebar from "../components/navigation/OrganizerSidebar";
 import ParticipantSidebar from "../components/navigation/ParticipantSidebar";
 import AdminSidebar from "../components/navigation/AdminSidebar";
+import Navbar from "../components/navigation/Navbar";
 
 function DashboardLayout() {
-  const { user, logoutUser } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <main className="dashboard-shell">
-      {user.role === "admin" ? <AdminSidebar /> : user.role === "organizer" ? <OrganizerSidebar /> : <ParticipantSidebar />}
+    <main className="dashboard-page">
+      <Navbar hideLogout />
 
-      <section className="dashboard-main">
-        <header className="dashboard-topbar">
-          <div>
-            <p className="dashboard-eyebrow">Signed in as</p>
-            <h1>{user.name}</h1>
-          </div>
+      <div className="dashboard-shell">
+        {user.role === "admin" ? <AdminSidebar /> : user.role === "organizer" ? <OrganizerSidebar /> : <ParticipantSidebar />}
 
-          <div className="dashboard-topbar-actions">
-            <RoleBadge role={user.role} />
-            <button
-              type="button"
-              className="nav-button nav-button-secondary nav-button-plain"
-              onClick={logoutUser}
-            >
-              Log Out
-            </button>
-          </div>
-        </header>
+        <section className="dashboard-main">
+          <header className="dashboard-topbar">
+            <div>
+              <p className="dashboard-eyebrow">Signed in as</p>
+              <h1>{user.name}</h1>
+            </div>
 
-        <Outlet />
-      </section>
+            <div className="dashboard-topbar-actions">
+              <RoleBadge role={user.role} />
+            </div>
+          </header>
+
+          <Outlet />
+        </section>
+      </div>
     </main>
   );
 }

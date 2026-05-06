@@ -8,18 +8,28 @@ import sportsImage from "../../components/images/sports.png";
 import seminarImage from "../../components/images/seminar.png";
 import weddingImage2 from "../../components/images/wedding2.png";
 import concertImage2 from "../../components/images/concert2.png";
+import { getPublicEvents } from "../../services/events";
 
 function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedPublishedEvent, setSelectedPublishedEvent] = useState(null);
+  const [publishedEvents, setPublishedEvents] = useState([]);
 
   useEffect(() => {
-    if (!selectedEvent) {
+    getPublicEvents()
+      .then(({ data }) => setPublishedEvents(data.events))
+      .catch(() => setPublishedEvents([]));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedEvent && !selectedPublishedEvent) {
       return undefined;
     }
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         setSelectedEvent(null);
+        setSelectedPublishedEvent(null);
       }
     };
 
@@ -30,7 +40,15 @@ function EventsPage() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedEvent]);
+  }, [selectedEvent, selectedPublishedEvent]);
+
+  const getLowestTicketPrice = (event) => {
+    if (event.entryType !== "tickets" || !event.ticket?.categories?.length) {
+      return null;
+    }
+
+    return Math.min(...event.ticket.categories.map((category) => Number(category.price)));
+  };
 
   const eventCategories = [
     {
@@ -189,6 +207,24 @@ function EventsPage() {
           discover next.
         </p>
 
+        {publishedEvents.length > 0 ? (
+          <div className="published-event-grid">
+            {publishedEvents.map((event) => (
+              <button key={event._id} type="button" className="published-event-card published-event-card-button" onClick={() => setSelectedPublishedEvent(event)}>
+                {event.eventImage ? (
+                  <img className="published-event-image" src={event.eventImage} alt={event.name} />
+                ) : (
+                  <div className="published-event-image published-event-image-empty" />
+                )}
+                <span className="event-card-tag">Published</span>
+                <h2>{event.name}</h2>
+                <p>{new Date(event.date).toLocaleDateString()} at {event.time}</p>
+                {getLowestTicketPrice(event) !== null ? <strong>From BDT {getLowestTicketPrice(event)}</strong> : null}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         <div className="event-card-grid">
           {eventCategories.map((category) =>
             modalEnabledEvents.has(category.name) ? (
@@ -310,6 +346,49 @@ function EventsPage() {
                     Maybe Later
                   </button>
                 </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {selectedPublishedEvent ? (
+        <div className="event-modal-backdrop" onClick={() => setSelectedPublishedEvent(null)} role="presentation">
+          <section className="event-modal event-details-modal" role="dialog" aria-modal="true" aria-labelledby="published-event-details-title" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="event-modal-close" onClick={() => setSelectedPublishedEvent(null)} aria-label="Close event details">
+              x
+            </button>
+            <div className="event-modal-content">
+              <div className="event-modal-visual">
+                {selectedPublishedEvent.eventImage ? <img src={selectedPublishedEvent.eventImage} alt={selectedPublishedEvent.name} /> : null}
+              </div>
+              <div className="event-modal-copy">
+                <p className="event-modal-kicker">{selectedPublishedEvent.eventType || "Event"}</p>
+                <h2 id="published-event-details-title">{selectedPublishedEvent.name}</h2>
+                <p className="event-modal-intro">{selectedPublishedEvent.organizerName}</p>
+                <div className="event-modal-stats">
+                  <div className="event-modal-stat"><span>Date</span><strong>{new Date(selectedPublishedEvent.date).toLocaleDateString()} at {selectedPublishedEvent.time}</strong></div>
+                  <div className="event-modal-stat"><span>Venue</span><strong>{selectedPublishedEvent.venue}</strong></div>
+                  <div className="event-modal-stat"><span>Capacity</span><strong>{selectedPublishedEvent.capacity}</strong></div>
+                  <div className="event-modal-stat"><span>Duration</span><strong>{selectedPublishedEvent.duration}</strong></div>
+                </div>
+                <div className="event-modal-section">
+                  <h3>Contact</h3>
+                  <p>{selectedPublishedEvent.contactNumber}</p>
+                  <p>{selectedPublishedEvent.contactEmail}</p>
+                </div>
+                {selectedPublishedEvent.entryType === "tickets" && selectedPublishedEvent.ticket?.categories?.length > 0 ? (
+                  <div className="overview-ticket-tiers">
+                    {selectedPublishedEvent.ticket.categories.map((category) => (
+                      <div key={category.name}>
+                        <span>{category.name}</span>
+                        <strong>BDT {category.price} - {category.available} left</strong>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="event-modal-intro">Access: {selectedPublishedEvent.entryType}</p>
+                )}
               </div>
             </div>
           </section>

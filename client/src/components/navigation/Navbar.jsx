@@ -2,8 +2,12 @@ import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../images/logo.png";
 
-function Navbar() {
+function Navbar({ hideLogout = false }) {
   const { isAuthenticated, user, logoutUser } = useAuth();
+  const dashboardPath =
+    user?.role === "admin" ? "/admin" : user?.role === "organizer" ? "/organizer" : "/participant";
+  const dashboardLabel =
+    user?.role === "admin" ? "Admin Panel" : user?.role === "organizer" ? "Organizer Hub" : "My Dashboard";
 
   return (
     <header className="home-header">
@@ -23,17 +27,19 @@ function Navbar() {
           <>
             <Link
               className="nav-button nav-button-secondary"
-              to={user.role === "organizer" ? "/organizer" : "/participant"}
+              to={dashboardPath}
             >
-              {user.role === "organizer" ? "Organizer Hub" : "My Dashboard"}
+              {dashboardLabel}
             </Link>
-            <button
-              type="button"
-              className="nav-button nav-button-primary nav-button-plain"
-              onClick={logoutUser}
-            >
-              Log Out
-            </button>
+            {!hideLogout ? (
+              <button
+                type="button"
+                className="nav-button nav-button-primary nav-button-plain"
+                onClick={logoutUser}
+              >
+                Log Out
+              </button>
+            ) : null}
           </>
         ) : (
           <>
