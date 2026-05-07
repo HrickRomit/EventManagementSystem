@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import TicketActions from "../../components/cart/TicketActions";
 import Navbar from "../../components/navigation/Navbar";
+import { useCart } from "../../context/CartContext";
 import weddingImage from "../../components/images/wedding.png";
 import concertImage from "../../components/images/concert.png";
 import hackathonImage from "../../components/images/hackathon.png";
@@ -8,17 +10,12 @@ import sportsImage from "../../components/images/sports.png";
 import seminarImage from "../../components/images/seminar.png";
 import weddingImage2 from "../../components/images/wedding2.png";
 import concertImage2 from "../../components/images/concert2.png";
-import { bookEvent, getPublicEvents } from "../../services/events";
-import { useAuth } from "../../context/AuthContext";
+import { getPublicEvents } from "../../services/events";
 
 function EventsPage() {
-  const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { openTicketSelector } = useCart();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedPublishedEvent, setSelectedPublishedEvent] = useState(null);
-  const [selectedTicketCategory, setSelectedTicketCategory] = useState("");
-  const [bookingStatus, setBookingStatus] = useState({ type: "", message: "" });
-  const [isBooking, setIsBooking] = useState(false);
   const [publishedEvents, setPublishedEvents] = useState([]);
 
   useEffect(() => {
@@ -26,19 +23,6 @@ function EventsPage() {
       .then(({ data }) => setPublishedEvents(data.events))
       .catch(() => setPublishedEvents([]));
   }, []);
-
-  useEffect(() => {
-    if (selectedPublishedEvent?.entryType === "tickets") {
-      setSelectedTicketCategory(
-        selectedPublishedEvent.ticket?.categories?.find((category) => category.available > 0)?.name || ""
-      );
-    } else {
-      setSelectedTicketCategory("");
-    }
-
-    setBookingStatus({ type: "", message: "" });
-    setIsBooking(false);
-  }, [selectedPublishedEvent?._id]);
 
   useEffect(() => {
     if (!selectedEvent && !selectedPublishedEvent) {
@@ -67,65 +51,6 @@ function EventsPage() {
     }
 
     return Math.min(...event.ticket.categories.map((category) => Number(category.price)));
-  };
-
-  const getBookingButtonLabel = (event) => {
-    if (!event) {
-      return "Book Event";
-    }
-
-    if (event.capacity <= 0) {
-      return "Sold Out";
-    }
-
-    if (event.entryType === "tickets") {
-      return isBooking ? "Booking..." : "Book Ticket";
-    }
-
-    return isBooking ? "Registering..." : "Register";
-  };
-
-  const handleBookEvent = async () => {
-    if (!selectedPublishedEvent) {
-      return;
-    }
-
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-
-    if (user?.role !== "participant") {
-      setBookingStatus({ type: "error", message: "Only participant accounts can book events." });
-      return;
-    }
-
-    if (selectedPublishedEvent.entryType === "tickets" && !selectedTicketCategory) {
-      setBookingStatus({ type: "error", message: "Choose a ticket category first." });
-      return;
-    }
-
-    setIsBooking(true);
-    setBookingStatus({ type: "", message: "" });
-
-    try {
-      const { data } = await bookEvent(selectedPublishedEvent._id, {
-        ticketCategory: selectedTicketCategory || undefined
-      });
-
-      setPublishedEvents((events) =>
-        events.map((event) => (event._id === data.event._id ? data.event : event))
-      );
-      setSelectedPublishedEvent(data.event);
-      setBookingStatus({ type: "success", message: "Booking confirmed. Your seat has been reserved." });
-    } catch (error) {
-      setBookingStatus({
-        type: "error",
-        message: error.response?.data?.message || "Booking failed. Please try again."
-      });
-    } finally {
-      setIsBooking(false);
-    }
   };
 
   const eventCategories = [
@@ -288,7 +213,7 @@ function EventsPage() {
         {publishedEvents.length > 0 ? (
           <div className="published-event-grid">
             {publishedEvents.map((event) => (
-              <button key={event._id} type="button" className="published-event-card published-event-card-button" onClick={() => setSelectedPublishedEvent(event)}>
+              <article key={event._id} className="published-event-card">
                 {event.eventImage ? (
                   <img className="published-event-image" src={event.eventImage} alt={event.name} />
                 ) : (
@@ -298,7 +223,13 @@ function EventsPage() {
                 <h2>{event.name}</h2>
                 <p>{new Date(event.date).toLocaleDateString()} at {event.time}</p>
                 {getLowestTicketPrice(event) !== null ? <strong>From BDT {getLowestTicketPrice(event)}</strong> : null}
-              </button>
+                <div className="published-event-actions">
+                  <button type="button" className="event-details-button" onClick={() => setSelectedPublishedEvent(event)}>
+                    Details
+                  </button>
+                  <TicketActions event={event} />
+                </div>
+              </article>
             ))}
           </div>
         ) : null}
@@ -459,49 +390,34 @@ function EventsPage() {
                   <div className="booking-ticket-panel">
                     <div className="overview-ticket-tiers">
                     {selectedPublishedEvent.ticket.categories.map((category) => (
-                      <label key={category.name} className={`booking-ticket-choice ${selectedTicketCategory === category.name ? "booking-ticket-choice-active" : ""} ${category.available <= 0 ? "booking-ticket-choice-disabled" : ""}`}>
-                        <input
-                          type="radio"
-                          name="ticketCategory"
-                          value={category.name}
-                          checked={selectedTicketCategory === category.name}
-                          disabled={category.available <= 0 || isBooking}
-                          onChange={() => setSelectedTicketCategory(category.name)}
-                        />
+                      <button
+                        key={category.name}
+                        type="button"
+                        className={`booking-ticket-choice ${category.available <= 0 ? "booking-ticket-choice-disabled" : ""}`}
+                        disabled={category.available <= 0}
+                        onClick={(clickEvent) => {
+                          clickEvent.stopPropagation();
+                          openTicketSelector(selectedPublishedEvent, category.name);
+                        }}
+                      >
                         <span>{category.name}</span>
                         <strong>BDT {category.price} - {category.available} left</strong>
-                      </label>
+                      </button>
                     ))}
                     </div>
                   </div>
                 ) : (
                   <p className="event-modal-intro">Access: {selectedPublishedEvent.entryType}</p>
                 )}
-                {selectedPublishedEvent.entryType !== "none" ? (
-                  <div className="event-modal-actions">
-                    <button
-                      type="button"
-                      className="nav-button nav-button-primary"
-                      onClick={handleBookEvent}
-                      disabled={isBooking || selectedPublishedEvent.capacity <= 0}
-                    >
-                      {getBookingButtonLabel(selectedPublishedEvent)}
-                    </button>
-                    <Link className="nav-button nav-button-secondary" to="/participant/registrations">
-                      My Registrations
-                    </Link>
-                  </div>
-                ) : null}
-                {bookingStatus.message ? (
-                  <p className={`booking-message booking-message-${bookingStatus.type}`}>
-                    {bookingStatus.message}
-                  </p>
+                {selectedPublishedEvent.entryType === "tickets" ? (
+                  <p className="event-modal-intro">Select a ticket tier to choose quantity and add it to your cart.</p>
                 ) : null}
               </div>
             </div>
           </section>
         </div>
       ) : null}
+
     </main>
   );
 }

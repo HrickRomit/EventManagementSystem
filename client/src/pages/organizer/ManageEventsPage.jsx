@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import TicketActions from "../../components/cart/TicketActions";
 import { bangladeshVenues, eventTypes } from "../../data/bangladeshVenues";
 import { deleteEvent, getOrganizerEvents, updateEvent } from "../../services/events";
 
@@ -235,6 +236,7 @@ function ManageEventsPage() {
                   </td>
                   <td>{event.capacity}</td>
                   <td className="action-buttons">
+                    <TicketActions event={event} />
                     <button className="btn-edit" type="button" onClick={() => startEdit(event)}>
                       Edit
                     </button>

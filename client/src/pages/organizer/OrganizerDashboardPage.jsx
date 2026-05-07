@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import TicketActions from "../../components/cart/TicketActions";
+import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { getOrganizerEvents } from "../../services/events";
 
@@ -22,7 +24,7 @@ const getLowestTicketPrice = (event) => {
 };
 
 const EventSummaryCard = ({ event, onSelect }) => (
-  <button type="button" className="overview-event-card overview-event-card-button" onClick={() => onSelect(event)}>
+  <article className="overview-event-card">
     {event.eventImage ? (
       <img className="overview-event-image" src={event.eventImage} alt={event.name} />
     ) : (
@@ -32,51 +34,72 @@ const EventSummaryCard = ({ event, onSelect }) => (
       <h3>{event.name}</h3>
       <p>{formatEventDate(event)}</p>
       {getLowestTicketPrice(event) !== null ? <strong>From BDT {getLowestTicketPrice(event)}</strong> : null}
+      <div className="published-event-actions">
+        <button type="button" className="event-details-button" onClick={() => onSelect(event)}>
+          Details
+        </button>
+        <TicketActions event={event} />
+      </div>
     </div>
-  </button>
+  </article>
 );
 
-const EventDetailsModal = ({ event, onClose }) => (
-  <div className="event-modal-backdrop" onClick={onClose} role="presentation">
-    <section className="event-modal event-details-modal" role="dialog" aria-modal="true" aria-labelledby="organizer-event-details-title" onClick={(clickEvent) => clickEvent.stopPropagation()}>
-      <button type="button" className="event-modal-close" onClick={onClose} aria-label="Close event details">
-        x
-      </button>
-      <div className="event-modal-content">
-        <div className="event-modal-visual">
-          {event.eventImage ? <img src={event.eventImage} alt={event.name} /> : null}
-        </div>
-        <div className="event-modal-copy">
-          <p className="event-modal-kicker">{event.eventType || "Event"}</p>
-          <h2 id="organizer-event-details-title">{event.name}</h2>
-          <div className="event-modal-stats">
-            <div className="event-modal-stat"><span>Date</span><strong>{formatEventDate(event)}</strong></div>
-            <div className="event-modal-stat"><span>Venue</span><strong>{event.venue}</strong></div>
-            <div className="event-modal-stat"><span>Capacity</span><strong>{event.capacity}</strong></div>
-            <div className="event-modal-stat"><span>Duration</span><strong>{event.duration}</strong></div>
+const EventDetailsModal = ({ event, onClose }) => {
+  const { openTicketSelector } = useCart();
+
+  return (
+    <div className="event-modal-backdrop" onClick={onClose} role="presentation">
+      <section className="event-modal event-details-modal" role="dialog" aria-modal="true" aria-labelledby="organizer-event-details-title" onClick={(clickEvent) => clickEvent.stopPropagation()}>
+        <button type="button" className="event-modal-close" onClick={onClose} aria-label="Close event details">
+          x
+        </button>
+        <div className="event-modal-content">
+          <div className="event-modal-visual">
+            {event.eventImage ? <img src={event.eventImage} alt={event.name} /> : null}
           </div>
-          <div className="event-modal-section">
-            <h3>Contact</h3>
-            <p>{event.contactNumber}</p>
-            <p>{event.contactEmail}</p>
-          </div>
-          {event.entryType === "tickets" && event.ticket?.categories?.length > 0 ? (
-            <div className="overview-ticket-tiers">
-              {event.ticket.categories.map((category) => (
-                <div key={category.name}>
-                  <span>{category.name}</span>
-                  <strong>BDT {category.price} - {category.available} left</strong>
-                </div>
-              ))}
+          <div className="event-modal-copy">
+            <p className="event-modal-kicker">{event.eventType || "Event"}</p>
+            <h2 id="organizer-event-details-title">{event.name}</h2>
+            <div className="event-modal-stats">
+              <div className="event-modal-stat"><span>Date</span><strong>{formatEventDate(event)}</strong></div>
+              <div className="event-modal-stat"><span>Venue</span><strong>{event.venue}</strong></div>
+              <div className="event-modal-stat"><span>Capacity</span><strong>{event.capacity}</strong></div>
+              <div className="event-modal-stat"><span>Duration</span><strong>{event.duration}</strong></div>
             </div>
-          ) : (
-            <p className="event-modal-intro">Access: {event.entryType}</p>
-          )}
+            <div className="event-modal-section">
+              <h3>Contact</h3>
+              <p>{event.contactNumber}</p>
+              <p>{event.contactEmail}</p>
+            </div>
+            {event.entryType === "tickets" && event.ticket?.categories?.length > 0 ? (
+              <div className="overview-ticket-tiers">
+                {event.ticket.categories.map((category) => (
+                  <div key={category.name} className="ticket-category-row">
+                    <div className="ticket-category-info">
+                      <span>{category.name}</span>
+                      <strong>BDT {category.price} - {category.available} left</strong>
+                    </div>
+                    <button 
+                      type="button" 
+                      className="ticket-buy-button"
+                      onClick={() => openTicketSelector(event, category.name)}
+                      disabled={category.available <= 0}
+                      aria-label={`Buy ${category.name} ticket`}
+                    >
+                      {category.available > 0 ? "Buy Now" : "Sold Out"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="event-modal-intro">Access: {event.entryType}</p>
+            )}
+          </div>
         </div>
-      </div>
-    </section>
-  </div>
-);
+      </section>
+    </div>
+  );
+};
 
 function OrganizerDashboardPage() {
   const { user } = useAuth();

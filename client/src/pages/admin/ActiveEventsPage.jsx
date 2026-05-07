@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import TicketActions from "../../components/cart/TicketActions";
 import { getAdminEvents } from "../../services/api";
 
 function ActiveEventsPage() {
@@ -82,6 +83,9 @@ function ActiveEventsPage() {
                     </dd>
                   </div>
                 </dl>
+                <div className="admin-event-actions">
+                  <TicketActions event={event} />
+                </div>
               </article>
             );
           })}
