@@ -107,6 +107,12 @@ body {
   box-shadow: 0 14px 28px rgba(20, 48, 74, 0.18);
 }
 
+.nav-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .nav-button-plain {
   appearance: none;
 }
@@ -1036,6 +1042,55 @@ body {
   font-size: 1.2rem;
 }
 
+.booking-ticket-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-ticket-choice {
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 118, 110, 0.12);
+  background: rgba(15, 118, 110, 0.08);
+  cursor: pointer;
+}
+
+.booking-ticket-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.booking-ticket-choice-active {
+  border-color: rgba(15, 118, 110, 0.42);
+  background: rgba(15, 118, 110, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(15, 118, 110, 0.18);
+}
+
+.booking-ticket-choice-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.booking-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+.booking-message-success {
+  color: #166534;
+  background: rgba(220, 252, 231, 0.75);
+  border: 1px solid rgba(134, 239, 172, 0.45);
+}
+
+.booking-message-error {
+  color: #991b1b;
+  background: rgba(254, 226, 226, 0.75);
+  border: 1px solid rgba(248, 113, 113, 0.36);
+}
+
 .overview-empty {
   margin: 0;
   color: rgba(20, 48, 74, 0.72);
@@ -1094,6 +1149,73 @@ body {
   font-size: clamp(2rem, 3vw, 3rem);
   color: #14304a;
   font-weight: 700;
+}
+
+.admin-count-pill {
+  min-width: 92px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  font-weight: 800;
+  text-align: center;
+}
+
+.admin-event-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-event-row {
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(20, 48, 74, 0.08);
+  background: rgba(247, 249, 251, 0.96);
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.admin-event-main {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.admin-event-main img,
+.admin-event-image-empty {
+  width: 112px;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  object-fit: cover;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(180, 83, 9, 0.12));
+}
+
+.admin-event-main h3,
+.admin-event-main p,
+.admin-event-meta {
+  margin: 0;
+}
+
+.admin-event-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-event-meta dt {
+  color: #0f766e;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-event-meta dd {
+  margin: 4px 0 0;
+  color: rgba(20, 48, 74, 0.78);
 }
 
 .manage-users-header h2,
@@ -1523,6 +1645,47 @@ body {
   color: rgba(20, 48, 74, 0.78);
 }
 
+.registration-list {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 14px;
+}
+
+.registration-card {
+  padding: 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(20, 48, 74, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(260px, 1.2fr);
+  gap: 18px;
+}
+
+.registration-card h3,
+.registration-card p,
+.registration-card dl {
+  margin: 0;
+}
+
+.registration-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.registration-card dt {
+  color: #0f766e;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.registration-card dd {
+  margin: 5px 0 0;
+  color: rgba(20, 48, 74, 0.78);
+}
+
 @media (max-width: 920px) {
   .home-header {
     border-radius: 32px;
@@ -1564,6 +1727,16 @@ body {
   .dashboard-topbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .admin-event-row,
+  .admin-event-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .registration-card,
+  .registration-card dl {
+    grid-template-columns: 1fr;
   }
 }
 

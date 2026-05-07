@@ -89,7 +89,7 @@ const eventSchema = new mongoose.Schema(
     capacity: {
       type: Number,
       required: true,
-      min: 1
+      min: 0
     },
     entryType: {
       type: String,

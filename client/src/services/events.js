@@ -2,6 +2,10 @@ import api from "./api";
 
 export const getPublicEvents = () => api.get("/events");
 
+export const bookEvent = (eventId, bookingData = {}) => api.post(`/events/${eventId}/book`, bookingData);
+
+export const getMyRegistrations = () => api.get("/events/registrations/mine");
+
 export const getOrganizerEvents = () => api.get("/events/mine");
 
 export const createEvent = (eventData) => api.post("/events", eventData);

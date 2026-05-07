@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/navigation/Navbar";
 import weddingImage from "../../components/images/wedding.png";
 import concertImage from "../../components/images/concert.png";
@@ -8,11 +8,17 @@ import sportsImage from "../../components/images/sports.png";
 import seminarImage from "../../components/images/seminar.png";
 import weddingImage2 from "../../components/images/wedding2.png";
 import concertImage2 from "../../components/images/concert2.png";
-import { getPublicEvents } from "../../services/events";
+import { bookEvent, getPublicEvents } from "../../services/events";
+import { useAuth } from "../../context/AuthContext";
 
 function EventsPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedPublishedEvent, setSelectedPublishedEvent] = useState(null);
+  const [selectedTicketCategory, setSelectedTicketCategory] = useState("");
+  const [bookingStatus, setBookingStatus] = useState({ type: "", message: "" });
+  const [isBooking, setIsBooking] = useState(false);
   const [publishedEvents, setPublishedEvents] = useState([]);
 
   useEffect(() => {
@@ -20,6 +26,19 @@ function EventsPage() {
       .then(({ data }) => setPublishedEvents(data.events))
       .catch(() => setPublishedEvents([]));
   }, []);
+
+  useEffect(() => {
+    if (selectedPublishedEvent?.entryType === "tickets") {
+      setSelectedTicketCategory(
+        selectedPublishedEvent.ticket?.categories?.find((category) => category.available > 0)?.name || ""
+      );
+    } else {
+      setSelectedTicketCategory("");
+    }
+
+    setBookingStatus({ type: "", message: "" });
+    setIsBooking(false);
+  }, [selectedPublishedEvent?._id]);
 
   useEffect(() => {
     if (!selectedEvent && !selectedPublishedEvent) {
@@ -48,6 +67,65 @@ function EventsPage() {
     }
 
     return Math.min(...event.ticket.categories.map((category) => Number(category.price)));
+  };
+
+  const getBookingButtonLabel = (event) => {
+    if (!event) {
+      return "Book Event";
+    }
+
+    if (event.capacity <= 0) {
+      return "Sold Out";
+    }
+
+    if (event.entryType === "tickets") {
+      return isBooking ? "Booking..." : "Book Ticket";
+    }
+
+    return isBooking ? "Registering..." : "Register";
+  };
+
+  const handleBookEvent = async () => {
+    if (!selectedPublishedEvent) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (user?.role !== "participant") {
+      setBookingStatus({ type: "error", message: "Only participant accounts can book events." });
+      return;
+    }
+
+    if (selectedPublishedEvent.entryType === "tickets" && !selectedTicketCategory) {
+      setBookingStatus({ type: "error", message: "Choose a ticket category first." });
+      return;
+    }
+
+    setIsBooking(true);
+    setBookingStatus({ type: "", message: "" });
+
+    try {
+      const { data } = await bookEvent(selectedPublishedEvent._id, {
+        ticketCategory: selectedTicketCategory || undefined
+      });
+
+      setPublishedEvents((events) =>
+        events.map((event) => (event._id === data.event._id ? data.event : event))
+      );
+      setSelectedPublishedEvent(data.event);
+      setBookingStatus({ type: "success", message: "Booking confirmed. Your seat has been reserved." });
+    } catch (error) {
+      setBookingStatus({
+        type: "error",
+        message: error.response?.data?.message || "Booking failed. Please try again."
+      });
+    } finally {
+      setIsBooking(false);
+    }
   };
 
   const eventCategories = [
@@ -378,17 +456,47 @@ function EventsPage() {
                   <p>{selectedPublishedEvent.contactEmail}</p>
                 </div>
                 {selectedPublishedEvent.entryType === "tickets" && selectedPublishedEvent.ticket?.categories?.length > 0 ? (
-                  <div className="overview-ticket-tiers">
+                  <div className="booking-ticket-panel">
+                    <div className="overview-ticket-tiers">
                     {selectedPublishedEvent.ticket.categories.map((category) => (
-                      <div key={category.name}>
+                      <label key={category.name} className={`booking-ticket-choice ${selectedTicketCategory === category.name ? "booking-ticket-choice-active" : ""} ${category.available <= 0 ? "booking-ticket-choice-disabled" : ""}`}>
+                        <input
+                          type="radio"
+                          name="ticketCategory"
+                          value={category.name}
+                          checked={selectedTicketCategory === category.name}
+                          disabled={category.available <= 0 || isBooking}
+                          onChange={() => setSelectedTicketCategory(category.name)}
+                        />
                         <span>{category.name}</span>
                         <strong>BDT {category.price} - {category.available} left</strong>
-                      </div>
+                      </label>
                     ))}
+                    </div>
                   </div>
                 ) : (
                   <p className="event-modal-intro">Access: {selectedPublishedEvent.entryType}</p>
                 )}
+                {selectedPublishedEvent.entryType !== "none" ? (
+                  <div className="event-modal-actions">
+                    <button
+                      type="button"
+                      className="nav-button nav-button-primary"
+                      onClick={handleBookEvent}
+                      disabled={isBooking || selectedPublishedEvent.capacity <= 0}
+                    >
+                      {getBookingButtonLabel(selectedPublishedEvent)}
+                    </button>
+                    <Link className="nav-button nav-button-secondary" to="/participant/registrations">
+                      My Registrations
+                    </Link>
+                  </div>
+                ) : null}
+                {bookingStatus.message ? (
+                  <p className={`booking-message booking-message-${bookingStatus.type}`}>
+                    {bookingStatus.message}
+                  </p>
+                ) : null}
               </div>
             </div>
           </section>

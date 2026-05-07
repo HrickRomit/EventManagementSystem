@@ -24,6 +24,10 @@ export const getAdminUsers = (role = null) => {
   return api.get("/admin/users", { params: { role } });
 };
 
+export const getAdminEvents = () => {
+  return api.get("/admin/events");
+};
+
 export const updateAdminUser = (userId, userData) => {
   return api.put(`/admin/users/${userId}`, userData);
 };

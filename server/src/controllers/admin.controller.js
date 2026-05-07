@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Event from "../models/event.model.js";
 import { generateToken } from "../utils/generateToken.js";
 
 const ADMIN_USERNAME = "admin";
@@ -44,6 +45,19 @@ export const getAllUsers = async (req, res) => {
     res.json({ users, total: users.length });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
+
+export const getActiveEvents = async (_req, res) => {
+  try {
+    const events = await Event.find({ status: "published" })
+      .select("-__v")
+      .sort({ date: 1, time: 1 })
+      .lean();
+
+    res.json({ events, total: events.length });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch active events" });
   }
 };
 

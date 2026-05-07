@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth, requireRole } from "../middleware/auth.middleware.js";
 import { 
   loginAdmin,
+  getActiveEvents,
   getAllUsers, 
   updateUser, 
   deleteUser
@@ -15,6 +16,7 @@ router.post("/login", loginAdmin);
 router.use(requireAuth, requireRole("admin"));
 
 router.get("/users", getAllUsers);
+router.get("/events", getActiveEvents);
 router.put("/users/:id", updateUser);
 router.delete("/users/:id", deleteUser);
 

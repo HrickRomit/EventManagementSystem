@@ -11,7 +11,7 @@ function DashboardLayout() {
 
   return (
     <main className="dashboard-page">
-      <Navbar hideLogout />
+      <Navbar hideLogout hideActions={user.role === "admin"} />
 
       <div className="dashboard-shell">
         {user.role === "admin" ? <AdminSidebar /> : user.role === "organizer" ? <OrganizerSidebar /> : <ParticipantSidebar />}

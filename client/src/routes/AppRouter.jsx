@@ -17,6 +17,7 @@ import ParticipantProfilePage from "../pages/participant/ParticipantProfilePage"
 import MyRegistrationsPage from "../pages/participant/MyRegistrationsPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import ManageUsersPage from "../pages/admin/ManageUsersPage";
+import ActiveEventsPage from "../pages/admin/ActiveEventsPage";
 
 function AppRouter() {
   return (
@@ -51,6 +52,7 @@ function AppRouter() {
         <Route element={<DashboardLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="users" element={<ManageUsersPage />} />
+          <Route path="events" element={<ActiveEventsPage />} />
         </Route>
       </Route>
     </Routes>

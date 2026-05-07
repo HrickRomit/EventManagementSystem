@@ -2,8 +2,10 @@ import { Router } from "express";
 import { body } from "express-validator";
 import {
   createEvent,
+  bookEvent,
   deleteOrganizerEvent,
   getOrganizerEvents,
+  getParticipantRegistrations,
   getPublicEvents,
   updateOrganizerEvent
 } from "../controllers/event.controller.js";
@@ -71,6 +73,15 @@ const eventValidation = [
 ];
 
 router.get("/", getPublicEvents);
+router.get("/registrations/mine", requireAuth, requireRole("participant"), getParticipantRegistrations);
+router.post(
+  "/:id/book",
+  requireAuth,
+  requireRole("participant"),
+  [body("ticketCategory").optional().isIn(ticketCategoryOrder).withMessage("Choose a valid ticket category.")],
+  validateRequest,
+  bookEvent
+);
 
 router.use(requireAuth, requireRole("organizer"));
 router.get("/mine", getOrganizerEvents);

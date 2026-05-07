@@ -26,6 +26,16 @@ function AdminSidebar() {
         >
           Manage Users
         </NavLink>
+        <NavLink
+          to="/admin/events"
+          className={({ isActive }) =>
+            isActive
+              ? "dashboard-sidebar-link dashboard-sidebar-link-active"
+              : "dashboard-sidebar-link"
+          }
+        >
+          Active Events
+        </NavLink>
       </nav>
     </aside>
   );
