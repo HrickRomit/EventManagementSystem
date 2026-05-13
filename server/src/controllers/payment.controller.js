@@ -74,27 +74,23 @@ const fulfillPaidSession = async (session) => {
   }
 
   const cartItems = JSON.parse(session.metadata.cartItems || "[]");
+  const existingSessionRegistrations = await Registration.find({
+    stripeCheckoutSessionId: session.id
+  });
+
+  if (existingSessionRegistrations.length > 0) {
+    return existingSessionRegistrations;
+  }
+
   const registrations = [];
 
   for (const item of cartItems) {
-    try {
-      const result = await bookEventForParticipant(participantId, item.eventId, item.ticketCategory);
+    for (let ticketIndex = 0; ticketIndex < item.quantity; ticketIndex += 1) {
+      const result = await bookEventForParticipant(participantId, item.eventId, item.ticketCategory, {
+        allowDuplicateTickets: true
+      });
       const paidRegistration = await markRegistrationPaid(result.registration, session);
       registrations.push(paidRegistration);
-    } catch (error) {
-      if (error.statusCode !== 409) {
-        throw error;
-      }
-
-      const existingRegistration = await Registration.findOne({
-        participant: participantId,
-        event: item.eventId
-      });
-
-      if (existingRegistration) {
-        const paidRegistration = await markRegistrationPaid(existingRegistration, session);
-        registrations.push(paidRegistration);
-      }
     }
   }
 
@@ -121,22 +117,7 @@ export const createCheckoutSession = async (req, res, next) => {
       return res.status(400).json({ message: "Your cart is empty." });
     }
 
-    if (cartItems.some((item) => item.quantity !== 1)) {
-      return res.status(400).json({
-        message: "Checkout currently supports one ticket per event. Please set ticket quantity to 1."
-      });
-    }
-
     const eventIds = cartItems.map((item) => item.eventId);
-    const existingRegistration = await Registration.findOne({
-      participant: req.user._id,
-      event: { $in: eventIds }
-    });
-
-    if (existingRegistration) {
-      return res.status(409).json({ message: "You already booked one of the events in your cart." });
-    }
-
     const events = await Event.find({
       _id: { $in: eventIds },
       status: "published",
@@ -149,7 +130,7 @@ export const createCheckoutSession = async (req, res, next) => {
         (ticketCategory) => ticketCategory.name === item.ticketCategory
       );
 
-      if (!event || !category || Number(category.available) < 1 || Number(event.capacity) < 1) {
+      if (!event || !category || Number(category.available) < item.quantity || Number(event.capacity) < item.quantity) {
         throw new Error("One or more tickets in your cart are no longer available.");
       }
 
@@ -158,7 +139,7 @@ export const createCheckoutSession = async (req, res, next) => {
       }
 
       return {
-        quantity: 1,
+        quantity: item.quantity,
         price_data: {
           currency: getCurrency(),
           unit_amount: Math.round(Number(category.price) * 100),

@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
+import { ensureRegistrationIndexes } from "./models/registration.model.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,6 +23,7 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   await connectDB();
+  await ensureRegistrationIndexes();
 
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

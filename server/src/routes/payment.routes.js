@@ -17,7 +17,7 @@ router.post(
     body("items").isArray({ min: 1 }).withMessage("Add at least one ticket to checkout."),
     body("items.*.eventId").notEmpty().withMessage("Event ID is required."),
     body("items.*.ticketCategory").isIn(["premium", "regular", "economy"]).withMessage("Choose a valid ticket category."),
-    body("items.*.quantity").isInt({ min: 1, max: 1 }).withMessage("Checkout supports one ticket per event.")
+    body("items.*.quantity").isInt({ min: 1, max: 100 }).withMessage("Choose between 1 and 100 tickets.")
   ],
   validateRequest,
   createCheckoutSession

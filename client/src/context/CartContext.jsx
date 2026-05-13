@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 const CART_KEY = "eventsphere-cart";
 
@@ -20,6 +21,7 @@ const readStoredCart = () => {
 };
 
 export function CartProvider({ children }) {
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState(readStoredCart);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [ticketSelection, setTicketSelection] = useState(null);
@@ -62,6 +64,13 @@ export function CartProvider({ children }) {
   );
 
   const openTicketSelector = (event, categoryName = "") => {
+    if (!user || user.role !== "participant") {
+      setMessageState("Log in as a participant to buy tickets.");
+      setMessageType("error");
+      setIsCartOpen(true);
+      return;
+    }
+
     if (event.entryType !== "tickets" || !event.ticket?.categories?.length) {
       return;
     }
@@ -83,7 +92,8 @@ export function CartProvider({ children }) {
   };
 
   const addTicketToCart = (event, category, quantity) => {
-    const safeQuantity = Math.max(1, Math.min(Number(quantity), Number(category.available), 1));
+    const available = Number(category.available || 0);
+    const safeQuantity = Math.max(1, Math.min(Number(quantity || 1), available));
     const cartKey = `${event._id}-${category.name}`;
 
     setCartItems((items) => {

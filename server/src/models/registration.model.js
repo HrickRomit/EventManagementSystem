@@ -120,9 +120,24 @@ const registrationSchema = new mongoose.Schema(
   }
 );
 
-registrationSchema.index({ participant: 1, event: 1 }, { unique: true });
+registrationSchema.index(
+  { participant: 1, event: 1, entryType: 1 },
+  { unique: true, partialFilterExpression: { entryType: "registration" } }
+);
 registrationSchema.index({ ticketId: 1 }, { unique: true, sparse: true });
 
 const Registration = mongoose.model("Registration", registrationSchema);
+
+export const ensureRegistrationIndexes = async () => {
+  try {
+    await Registration.collection.dropIndex("participant_1_event_1");
+  } catch (error) {
+    if (error.codeName !== "IndexNotFound" && error.code !== 27) {
+      throw error;
+    }
+  }
+
+  await Registration.createIndexes();
+};
 
 export default Registration;

@@ -50,15 +50,16 @@ function TicketActions({ event }) {
   }
 
   const hasAvailableTicket = event.ticket.categories.some((category) => Number(category.available) > 0);
+  const isOrganizer = user?.role === "organizer";
 
   return (
     <button
       type="button"
       className="ticket-buy-button"
       onClick={() => openTicketSelector(event)}
-      disabled={!hasAvailableTicket}
+      disabled={!hasAvailableTicket || isOrganizer}
     >
-      {hasAvailableTicket ? "Buy Ticket" : "Sold Out"}
+      {isOrganizer ? "Participants Only" : hasAvailableTicket ? "Buy Ticket" : "Sold Out"}
     </button>
   );
 }

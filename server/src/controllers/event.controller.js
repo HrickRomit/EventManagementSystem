@@ -186,7 +186,12 @@ const createHttpError = (statusCode, message) => {
   return error;
 };
 
-export const bookEventForParticipant = async (participantId, eventId, ticketCategoryInput = "") => {
+export const bookEventForParticipant = async (
+  participantId,
+  eventId,
+  ticketCategoryInput = "",
+  { allowDuplicateTickets = false } = {}
+) => {
   const event = await Event.findOne({ _id: eventId, status: "published" });
 
   if (!event) {
@@ -197,13 +202,17 @@ export const bookEventForParticipant = async (participantId, eventId, ticketCate
     throw createHttpError(400, "This event does not require booking.");
   }
 
-  const existingRegistration = await Registration.findOne({
-    participant: participantId,
-    event: event._id
-  });
+  const shouldCheckExistingRegistration = event.entryType !== "tickets" || !allowDuplicateTickets;
 
-  if (existingRegistration) {
-    throw createHttpError(409, "You already booked this event.");
+  if (shouldCheckExistingRegistration) {
+    const existingRegistration = await Registration.findOne({
+      participant: participantId,
+      event: event._id
+    });
+
+    if (existingRegistration) {
+      throw createHttpError(409, "You already booked this event.");
+    }
   }
 
   const ticketCategory = event.entryType === "tickets" ? ticketCategoryInput : "";
