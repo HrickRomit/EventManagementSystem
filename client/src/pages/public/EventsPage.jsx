@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import TicketActions from "../../components/cart/TicketActions";
 import Navbar from "../../components/navigation/Navbar";
@@ -14,8 +14,11 @@ import { getPublicEvents } from "../../services/events";
 
 function EventsPage() {
   const { openTicketSelector } = useCart();
+  const activeEventsRef = useRef(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedPublishedEvent, setSelectedPublishedEvent] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("");
+  const [activeCategoryNotice, setActiveCategoryNotice] = useState("");
   const [publishedEvents, setPublishedEvents] = useState([]);
 
   useEffect(() => {
@@ -51,6 +54,50 @@ function EventsPage() {
     }
 
     return Math.min(...event.ticket.categories.map((category) => Number(category.price)));
+  };
+
+  const normalizeCategory = (value) => (value || "").toLowerCase().trim();
+
+  const getCategoryEvents = (categoryName) =>
+    publishedEvents.filter(
+      (event) => normalizeCategory(event.eventType) === normalizeCategory(categoryName),
+    );
+
+  const visiblePublishedEvents = useMemo(() => {
+    if (!activeCategory) {
+      return publishedEvents;
+    }
+
+    return getCategoryEvents(activeCategory);
+  }, [activeCategory, publishedEvents]);
+
+  const scrollToActiveEvents = () => {
+    window.requestAnimationFrame(() => {
+      activeEventsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
+  const handleCategoryExplore = (category) => {
+    const matches = getCategoryEvents(category.name);
+    setActiveCategory(category.name);
+    setSelectedEvent(null);
+
+    if (matches.length > 0) {
+      setActiveCategoryNotice(`Showing ${matches.length} active ${category.name.toLowerCase()} event${matches.length === 1 ? "" : "s"}.`);
+      scrollToActiveEvents();
+      return;
+    }
+
+    setActiveCategoryNotice(`No active ${category.name.toLowerCase()} events are available right now.`);
+    scrollToActiveEvents();
+  };
+
+  const clearCategoryFilter = () => {
+    setActiveCategory("");
+    setActiveCategoryNotice("");
   };
 
   const eventCategories = [
@@ -222,21 +269,30 @@ function EventsPage() {
                   <button
                     type="button"
                     className="event-card-media event-card-media-button"
-                    onClick={() => setSelectedEvent(category)}
-                    aria-label={`Open ${category.name.toLowerCase()} event details`}
+                    onClick={() => handleCategoryExplore(category)}
+                    aria-label={`Show active ${category.name.toLowerCase()} events`}
                   >
                     <img src={category.image} alt={category.imageAlt} />
                   </button>
                 ) : null}
                 <h2>{category.name}</h2>
                 <p>{category.description}</p>
-                <button
-                  type="button"
-                  className="event-card-cta event-card-cta-button"
-                  onClick={() => setSelectedEvent(category)}
-                >
-                  Explore {category.name}
-                </button>
+                <div className="event-card-action-row">
+                  <button
+                    type="button"
+                    className="event-card-cta event-card-cta-button"
+                    onClick={() => handleCategoryExplore(category)}
+                  >
+                    Active {category.name} Events
+                  </button>
+                  <button
+                    type="button"
+                    className="event-card-preview-button"
+                    onClick={() => setSelectedEvent(category)}
+                  >
+                    Preview
+                  </button>
+                </div>
               </article>
             ) : (
               <Link
@@ -258,14 +314,37 @@ function EventsPage() {
           )}
         </div>
 
-        {publishedEvents.length > 0 ? (
-          <section className="active-events-section" aria-labelledby="active-events-title">
+        {publishedEvents.length > 0 || activeCategory ? (
+          <section
+            ref={activeEventsRef}
+            className={`active-events-section ${activeCategory ? "active-events-section-focused" : ""}`}
+            aria-labelledby="active-events-title"
+          >
             <div className="active-events-heading">
-              <p className="hero-kicker">Currently active</p>
-              <h2 id="active-events-title">Upcoming events you can join.</h2>
+              <div>
+                <p className="hero-kicker">Currently active</p>
+                <h2 id="active-events-title">
+                  {activeCategory ? `${activeCategory} events you can join.` : "Upcoming events you can join."}
+                </h2>
+              </div>
+              {activeCategory ? (
+                <button
+                  type="button"
+                  className="nav-button nav-button-secondary active-events-clear"
+                  onClick={clearCategoryFilter}
+                >
+                  Show all events
+                </button>
+              ) : null}
             </div>
-            <div className="event-card-grid active-event-grid">
-              {publishedEvents.map((event) => (
+            {activeCategoryNotice ? (
+              <p className={visiblePublishedEvents.length > 0 ? "active-events-notice" : "active-events-notice active-events-notice-empty"}>
+                {activeCategoryNotice}
+              </p>
+            ) : null}
+            {visiblePublishedEvents.length > 0 ? (
+              <div className="event-card-grid active-event-grid">
+              {visiblePublishedEvents.map((event) => (
                 <article key={event._id} className="event-card active-event-card">
                   <span className="event-card-tag">Active</span>
                   <button
@@ -300,7 +379,13 @@ function EventsPage() {
                   </div>
                 </article>
               ))}
-            </div>
+              </div>
+            ) : (
+              <div className="active-events-empty">
+                <h3>No active events in this category yet.</h3>
+                <p>Try another event type or check back after organizers publish new events.</p>
+              </div>
+            )}
           </section>
         ) : null}
       </section>
@@ -363,12 +448,13 @@ function EventsPage() {
                 </div>
 
                 <div className="event-modal-actions">
-                  <Link
+                  <button
+                    type="button"
                     className="nav-button nav-button-primary"
-                    to={`/events?category=${encodeURIComponent(selectedEvent.name)}`}
+                    onClick={() => handleCategoryExplore(selectedEvent)}
                   >
                     View {selectedEvent.name} Events
-                  </Link>
+                  </button>
                   <button
                     type="button"
                     className="nav-button nav-button-secondary"
