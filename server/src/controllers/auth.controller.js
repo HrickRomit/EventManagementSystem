@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import getFirebaseAdmin from "../config/firebaseAdmin.js";
 import { generateToken } from "../utils/generateToken.js";
 
 const formatAuthResponse = (user) => ({
@@ -6,7 +7,8 @@ const formatAuthResponse = (user) => ({
   user: {
     id: user._id,
     name: user.name,
-    email: user.email,
+    email: user.email || "",
+    phoneNumber: user.phoneNumber || "",
     role: user.role,
     organizationName: user.organizationName || ""
   }
@@ -54,6 +56,100 @@ export const loginUser = async (req, res) => {
   }
 
   return res.json(formatAuthResponse(user));
+};
+
+export const phoneAuthUser = async (req, res) => {
+  const { idToken, mode = "login", name, role, organizationName } = req.body;
+
+  try {
+    const firebaseAdmin = getFirebaseAdmin();
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
+    const phoneNumber = decodedToken.phone_number;
+
+    if (!phoneNumber) {
+      return res.status(400).json({ message: "Verified phone number was not found." });
+    }
+
+    const existingUser = await User.findOne({ phoneNumber });
+
+    if (mode === "login") {
+      if (!existingUser) {
+        return res.status(404).json({ message: "No account exists for this phone number." });
+      }
+
+      if (role && existingUser.role !== role) {
+        return res.status(403).json({
+          message: `This account is registered as a ${existingUser.role}, not a ${role}.`
+        });
+      }
+
+      return res.json(formatAuthResponse(existingUser));
+    }
+
+    if (existingUser) {
+      return res.status(409).json({ message: "An account with this phone number already exists." });
+    }
+
+    const user = await User.create({
+      name,
+      phoneNumber,
+      role,
+      organizationName: role === "organizer" ? organizationName : ""
+    });
+
+    return res.status(201).json(formatAuthResponse(user));
+  } catch (error) {
+    return res.status(401).json({
+      message: "Phone verification failed. Please request a new OTP and try again."
+    });
+  }
+};
+
+export const googleAuthUser = async (req, res) => {
+  const { idToken, mode = "login", name, role, organizationName } = req.body;
+
+  try {
+    const firebaseAdmin = getFirebaseAdmin();
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(idToken);
+    const email = decodedToken.email?.toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({ message: "Verified Google email was not found." });
+    }
+
+    const existingUser = await User.findOne({ email });
+
+    if (mode === "login") {
+      if (!existingUser) {
+        return res.status(404).json({ message: "No account exists for this Google email." });
+      }
+
+      if (role && existingUser.role !== role) {
+        return res.status(403).json({
+          message: `This account is registered as a ${existingUser.role}, not a ${role}.`
+        });
+      }
+
+      return res.json(formatAuthResponse(existingUser));
+    }
+
+    if (existingUser) {
+      return res.status(409).json({ message: "An account with this Google email already exists." });
+    }
+
+    const user = await User.create({
+      name: name || decodedToken.name || email.split("@")[0],
+      email,
+      role,
+      organizationName: role === "organizer" ? organizationName : ""
+    });
+
+    return res.status(201).json(formatAuthResponse(user));
+  } catch (_error) {
+    return res.status(401).json({
+      message: "Google verification failed. Please try again."
+    });
+  }
 };
 
 export const getCurrentUser = async (req, res) => {

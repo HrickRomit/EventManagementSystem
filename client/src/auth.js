@@ -1,11 +1,29 @@
-import { signInWithPopup } from "firebase/auth";
+import {
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from "firebase/auth";
 import { auth, googleProvider } from "./firebase";
 
+// GOOGLE LOGIN
 export const signInWithGoogle = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result.user;
-  } catch (error) {
-    console.error("Google login error:", error);
-  }
+  return await signInWithPopup(auth, googleProvider);
+};
+
+// EMAIL SIGNUP
+export const signUpWithEmail = async (email, password) => {
+  return await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+};
+
+// EMAIL LOGIN
+export const loginWithEmail = async (email, password) => {
+  return await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
 };

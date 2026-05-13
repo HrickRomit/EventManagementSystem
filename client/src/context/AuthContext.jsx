@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getCurrentUser, login, loginAdmin, register } from "../services/auth";
+import { getCurrentUser, googleAuth, login, loginAdmin, phoneAuth, register } from "../services/auth";
 
 const TOKEN_KEY = "eventsphere-token";
 const USER_KEY = "eventsphere-user";
@@ -72,6 +72,18 @@ export function AuthProvider({ children }) {
     return authPayload;
   };
 
+  const phoneAuthUser = async (payload) => {
+    const authPayload = await phoneAuth(payload);
+    persistSession(authPayload);
+    return authPayload;
+  };
+
+  const googleAuthUser = async (payload) => {
+    const authPayload = await googleAuth(payload);
+    persistSession(authPayload);
+    return authPayload;
+  };
+
   const logoutUser = () => {
     window.localStorage.removeItem(TOKEN_KEY);
     window.localStorage.removeItem(USER_KEY);
@@ -87,6 +99,8 @@ export function AuthProvider({ children }) {
         loginUser,
         loginAdminUser,
         registerUser,
+        phoneAuthUser,
+        googleAuthUser,
         logoutUser
       }}
     >

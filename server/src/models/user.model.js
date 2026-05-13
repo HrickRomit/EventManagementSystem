@@ -10,14 +10,19 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,
       lowercase: true,
+      trim: true
+    },
+    phoneNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
       trim: true
     },
     password: {
       type: String,
-      required: true,
       minlength: 6
     },
     role: {
@@ -37,7 +42,7 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function hashPassword(next) {
-  if (!this.isModified("password")) {
+  if (!this.password || !this.isModified("password")) {
     next();
     return;
   }
