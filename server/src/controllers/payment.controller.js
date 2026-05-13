@@ -62,6 +62,51 @@ const markRegistrationPaid = async (registration, session) => {
   return registration;
 };
 
+const fulfillPaidSession = async (session) => {
+  const participantId = session.metadata?.userId;
+
+  if (!participantId) {
+    throw createPaymentError(400, "Payment session is missing participant details.");
+  }
+
+  if (session.payment_status !== "paid") {
+    throw createPaymentError(400, "Payment has not been completed yet.");
+  }
+
+  const cartItems = JSON.parse(session.metadata.cartItems || "[]");
+  const registrations = [];
+
+  for (const item of cartItems) {
+    try {
+      const result = await bookEventForParticipant(participantId, item.eventId, item.ticketCategory);
+      const paidRegistration = await markRegistrationPaid(result.registration, session);
+      registrations.push(paidRegistration);
+    } catch (error) {
+      if (error.statusCode !== 409) {
+        throw error;
+      }
+
+      const existingRegistration = await Registration.findOne({
+        participant: participantId,
+        event: item.eventId
+      });
+
+      if (existingRegistration) {
+        const paidRegistration = await markRegistrationPaid(existingRegistration, session);
+        registrations.push(paidRegistration);
+      }
+    }
+  }
+
+  return registrations;
+};
+
+const createPaymentError = (statusCode, message) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
 export const createCheckoutSession = async (req, res, next) => {
   try {
     const stripe = getStripeClient();
@@ -173,34 +218,7 @@ export const fulfillCheckoutSession = async (req, res, next) => {
       return res.status(403).json({ message: "This payment session does not belong to your account." });
     }
 
-    if (session.payment_status !== "paid") {
-      return res.status(400).json({ message: "Payment has not been completed yet." });
-    }
-
-    const cartItems = JSON.parse(session.metadata.cartItems || "[]");
-    const registrations = [];
-
-    for (const item of cartItems) {
-      try {
-        const result = await bookEventForParticipant(req.user._id, item.eventId, item.ticketCategory);
-        const paidRegistration = await markRegistrationPaid(result.registration, session);
-        registrations.push(paidRegistration);
-      } catch (error) {
-        if (error.statusCode !== 409) {
-          throw error;
-        }
-
-        const existingRegistration = await Registration.findOne({
-          participant: req.user._id,
-          event: item.eventId
-        });
-
-        if (existingRegistration) {
-          const paidRegistration = await markRegistrationPaid(existingRegistration, session);
-          registrations.push(paidRegistration);
-        }
-      }
-    }
+    const registrations = await fulfillPaidSession(session);
 
     return res.json({
       message: "Payment confirmed and tickets generated.",
@@ -211,6 +229,34 @@ export const fulfillCheckoutSession = async (req, res, next) => {
       return res.status(error.statusCode).json({ message: error.message });
     }
 
+    return next(error);
+  }
+};
+
+export const handleStripeWebhook = async (req, res, next) => {
+  try {
+    const stripe = getStripeClient();
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!stripe || !webhookSecret) {
+      return res.status(500).json({ message: "Stripe webhook is not configured on the server." });
+    }
+
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(req.body, req.headers["stripe-signature"], webhookSecret);
+    } catch (_error) {
+      return res.status(400).json({ message: "Invalid Stripe webhook signature." });
+    }
+
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      await fulfillPaidSession(session);
+    }
+
+    return res.json({ received: true });
+  } catch (error) {
     return next(error);
   }
 };

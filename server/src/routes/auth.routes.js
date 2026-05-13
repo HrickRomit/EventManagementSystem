@@ -5,7 +5,8 @@ import {
   googleAuthUser,
   loginUser,
   phoneAuthUser,
-  registerUser
+  registerUser,
+  updateCurrentUser
 } from "../controllers/auth.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 import { validateRequest } from "../middleware/validate.middleware.js";
@@ -128,5 +129,16 @@ router.post(
 );
 
 router.get("/me", requireAuth, getCurrentUser);
+router.put(
+  "/me",
+  requireAuth,
+  [
+    body("name").trim().notEmpty().withMessage("Name is required."),
+    body("phoneNumber").optional({ values: "falsy" }).trim(),
+    body("organizationName").optional({ values: "falsy" }).trim()
+  ],
+  validateRequest,
+  updateCurrentUser
+);
 
 export default router;

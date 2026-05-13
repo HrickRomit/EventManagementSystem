@@ -4,6 +4,7 @@ import {
   createEvent,
   bookEvent,
   deleteOrganizerEvent,
+  getOrganizerEventRegistrations,
   getOrganizerEvents,
   getParticipantRegistrations,
   getPublicEvents,
@@ -86,6 +87,7 @@ router.post(
 
 router.use(requireAuth, requireRole("organizer"));
 router.get("/mine", getOrganizerEvents);
+router.get("/:id/registrations", getOrganizerEventRegistrations);
 router.post(
   "/tickets/verify",
   [body("qrPayload").notEmpty().withMessage("QR ticket payload is required.")],

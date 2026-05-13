@@ -277,13 +277,34 @@ export const getParticipantRegistrations = async (req, res, next) => {
   }
 };
 
+export const getOrganizerEventRegistrations = async (req, res, next) => {
+  try {
+    const event = await Event.findOne({
+      _id: req.params.id,
+      organizer: req.user._id
+    }).select("name date time venue capacity entryType ticket");
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found." });
+    }
+
+    const registrations = await Registration.find({ event: event._id })
+      .sort({ createdAt: -1 })
+      .populate("participant", "name email phoneNumber")
+      .select("-__v");
+
+    return res.json({ event, registrations });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const verifyTicket = async (req, res, next) => {
   try {
     let ticketPayload;
 
     try {
-      ticketPayload =
-        typeof req.body.qrPayload === "string" ? JSON.parse(req.body.qrPayload) : req.body.qrPayload;
+      ticketPayload = typeof req.body.qrPayload === "string" ? JSON.parse(req.body.qrPayload) : req.body.qrPayload;
     } catch (_error) {
       return res.status(400).json({ message: "Invalid QR ticket payload." });
     }

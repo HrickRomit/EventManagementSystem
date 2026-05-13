@@ -1060,6 +1060,46 @@ body {
     linear-gradient(135deg, rgba(254, 244, 223, 0.6), rgba(233, 245, 242, 0.9));
 }
 
+.dashboard-card-wide {
+  grid-column: 1 / -1;
+}
+
+.dashboard-card-header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dashboard-ticket-list {
+  display: grid;
+  gap: 12px;
+}
+
+.dashboard-ticket-row {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(20, 48, 74, 0.08);
+  background: rgba(249, 250, 251, 0.92);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.dashboard-ticket-row p {
+  margin: 4px 0 0;
+  color: rgba(20, 48, 74, 0.72);
+}
+
+.dashboard-ticket-row span {
+  color: #0f766e;
+  font-size: 0.86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .organizer-overview {
   display: grid;
   gap: 18px;
@@ -1250,6 +1290,17 @@ body {
   background: #a0a0a0;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.ticket-action-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.ticket-action-message {
+  color: rgba(20, 48, 74, 0.72);
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 .overview-ticket-tiers div {
@@ -1761,7 +1812,8 @@ body {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 14px 16px;
   border-radius: 16px;
@@ -1771,10 +1823,16 @@ body {
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #0f766e;
   box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+}
+
+.form-group textarea {
+  min-height: 150px;
+  resize: vertical;
 }
 
 .form-actions {
@@ -1932,6 +1990,76 @@ body {
 .delete-confirm-modal p {
   color: rgba(20, 48, 74, 0.76);
   line-height: 1.6;
+}
+
+.organizer-event-picker {
+  min-width: min(320px, 100%);
+  margin-bottom: 0;
+}
+
+.registration-stats-grid {
+  margin-bottom: 18px;
+}
+
+.checkin-panel {
+  max-width: 720px;
+  margin-bottom: 18px;
+  padding: 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(20, 48, 74, 0.08);
+  background: rgba(249, 250, 251, 0.92);
+}
+
+.checkin-scanner {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.checkin-video {
+  width: 100%;
+  max-height: 260px;
+  border-radius: 18px;
+  background: rgba(20, 48, 74, 0.12);
+  object-fit: cover;
+}
+
+.checkin-scanner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.checkin-scanner-actions span {
+  color: rgba(20, 48, 74, 0.72);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.checkin-result-card dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.checkin-result-card dt {
+  color: #0f766e;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.checkin-result-card dd {
+  margin: 5px 0 0;
+  color: rgba(20, 48, 74, 0.78);
+}
+
+.profile-edit-form {
+  display: grid;
+  gap: 12px;
 }
 
 .published-event-grid {

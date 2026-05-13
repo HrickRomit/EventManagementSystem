@@ -2,16 +2,18 @@ import User from "../models/user.model.js";
 import getFirebaseAdmin from "../config/firebaseAdmin.js";
 import { generateToken } from "../utils/generateToken.js";
 
+const formatUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email || "",
+  phoneNumber: user.phoneNumber || "",
+  role: user.role,
+  organizationName: user.organizationName || ""
+});
+
 const formatAuthResponse = (user) => ({
   token: generateToken(user),
-  user: {
-    id: user._id,
-    name: user.name,
-    email: user.email || "",
-    phoneNumber: user.phoneNumber || "",
-    role: user.role,
-    organizationName: user.organizationName || ""
-  }
+  user: formatUser(user)
 });
 
 export const registerUser = async (req, res) => {
@@ -153,5 +155,31 @@ export const googleAuthUser = async (req, res) => {
 };
 
 export const getCurrentUser = async (req, res) => {
-  return res.json({ user: req.user });
+  return res.json({ user: formatUser(req.user) });
+};
+
+export const updateCurrentUser = async (req, res, next) => {
+  try {
+    const updates = {
+      name: req.body.name,
+      phoneNumber: req.body.phoneNumber || ""
+    };
+
+    if (req.user.role === "organizer") {
+      updates.organizationName = req.body.organizationName || "";
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+      runValidators: true
+    }).select("-password");
+
+    return res.json({ user: formatUser(user) });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ message: "That phone number is already linked to another account." });
+    }
+
+    return next(error);
+  }
 };

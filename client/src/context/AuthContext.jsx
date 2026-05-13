@@ -90,6 +90,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = (nextUser) => {
+    window.localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+    setUser(nextUser);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -101,7 +106,8 @@ export function AuthProvider({ children }) {
         registerUser,
         phoneAuthUser,
         googleAuthUser,
-        logoutUser
+        logoutUser,
+        updateUser
       }}
     >
       {children}

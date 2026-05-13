@@ -3,7 +3,9 @@ import { NavLink } from "react-router-dom";
 const organizerLinks = [
   { to: "/organizer", label: "Overview", end: true },
   { to: "/organizer/events", label: "Manage Events", end: true },
-  { to: "/organizer/events/new", label: "Create Event" }
+  { to: "/organizer/events/new", label: "Create Event" },
+  { to: "/organizer/registrations", label: "Registrations" },
+  { to: "/organizer/check-in", label: "QR Check-In" }
 ];
 
 function OrganizerSidebar() {

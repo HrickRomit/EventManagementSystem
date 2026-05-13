@@ -12,6 +12,8 @@ import RegisterPage from "../pages/auth/RegisterPage";
 import OrganizerDashboardPage from "../pages/organizer/OrganizerDashboardPage";
 import ManageEventsPage from "../pages/organizer/ManageEventsPage";
 import CreateEventPage from "../pages/organizer/CreateEventPage";
+import EventRegistrationsPage from "../pages/organizer/EventRegistrationsPage";
+import CheckInPage from "../pages/organizer/CheckInPage";
 import ParticipantDashboardPage from "../pages/participant/ParticipantDashboardPage";
 import ParticipantProfilePage from "../pages/participant/ParticipantProfilePage";
 import MyRegistrationsPage from "../pages/participant/MyRegistrationsPage";
@@ -47,6 +49,8 @@ function AppRouter() {
             <Route index element={<OrganizerDashboardPage />} />
             <Route path="events" element={<ManageEventsPage />} />
             <Route path="events/new" element={<CreateEventPage />} />
+            <Route path="registrations" element={<EventRegistrationsPage />} />
+            <Route path="check-in" element={<CheckInPage />} />
           </Route>
         </Route>
       </Route>

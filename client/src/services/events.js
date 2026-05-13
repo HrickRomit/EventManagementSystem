@@ -8,6 +8,10 @@ export const getMyRegistrations = () => api.get("/events/registrations/mine");
 
 export const getOrganizerEvents = () => api.get("/events/mine");
 
+export const getOrganizerEventRegistrations = (eventId) => api.get(`/events/${eventId}/registrations`);
+
+export const verifyTicket = (qrPayload) => api.post("/events/tickets/verify", { qrPayload });
+
 export const createEvent = (eventData) => api.post("/events", eventData);
 
 export const updateEvent = (eventId, eventData) => api.put(`/events/${eventId}`, eventData);

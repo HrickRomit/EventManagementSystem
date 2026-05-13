@@ -5,6 +5,7 @@ import healthRoutes from "./routes/health.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import { handleStripeWebhook } from "./controllers/payment.controller.js";
 
 const app = express();
 const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
@@ -26,6 +27,7 @@ app.use(
     }
   })
 );
+app.post("/api/payments/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
 app.use(express.json({ limit: "5mb" }));
 
 app.get("/", (_req, res) => {

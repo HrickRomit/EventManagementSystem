@@ -429,7 +429,10 @@ function EventsPage() {
                     </div>
                   </div>
                 ) : (
-                  <p className="event-modal-intro">Access: {selectedPublishedEvent.entryType}</p>
+                  <div className="booking-ticket-panel">
+                    <p className="event-modal-intro">Access: {selectedPublishedEvent.entryType}</p>
+                    <TicketActions event={selectedPublishedEvent} />
+                  </div>
                 )}
                 {selectedPublishedEvent.entryType === "tickets" ? (
                   <p className="event-modal-intro">Select a ticket tier to choose quantity and add it to your cart.</p>
