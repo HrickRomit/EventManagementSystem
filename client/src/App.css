@@ -354,6 +354,73 @@ body {
   background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.16), transparent 42%);
 }
 
+.active-events-section {
+  margin-top: 46px;
+}
+
+.active-events-heading {
+  display: grid;
+  gap: 8px;
+}
+
+.active-events-heading h2 {
+  width: min(640px, 100%);
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05;
+}
+
+.active-event-grid {
+  margin-top: 22px;
+}
+
+.active-event-card {
+  min-height: 320px;
+}
+
+.active-event-image-empty {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #0f766e;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(180, 83, 9, 0.12));
+}
+
+.active-event-price {
+  color: #0f766e;
+}
+
+.active-event-actions {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.payment-result-panel {
+  width: min(820px, 100%);
+  margin: 28px auto 0;
+  padding: clamp(32px, 7vw, 72px);
+  border-radius: 36px;
+  border: 1px solid rgba(20, 48, 74, 0.08);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.78)),
+    linear-gradient(135deg, #fef4df, #e9f5f2);
+  box-shadow: 0 28px 70px rgba(20, 48, 74, 0.12);
+}
+
+.payment-result-panel h1 {
+  width: min(640px, 100%);
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 4.8rem);
+  line-height: 0.98;
+}
+
 .event-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1973,7 +2040,8 @@ body {
   border: 1px solid rgba(20, 48, 74, 0.08);
   background: rgba(255, 255, 255, 0.9);
   display: grid;
-  grid-template-columns: minmax(180px, 0.8fr) minmax(260px, 1.2fr);
+  grid-template-columns: minmax(180px, 0.75fr) minmax(260px, 1.25fr) 116px;
+  align-items: center;
   gap: 18px;
 }
 
@@ -2000,6 +2068,34 @@ body {
 .registration-card dd {
   margin: 5px 0 0;
   color: rgba(20, 48, 74, 0.78);
+}
+
+.registration-ticket-id {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #14304a;
+}
+
+.registration-qr {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.registration-qr img {
+  width: 104px;
+  height: 104px;
+  border-radius: 8px;
+  border: 1px solid rgba(20, 48, 74, 0.12);
+  background: #ffffff;
+}
+
+.registration-qr a {
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 @media (max-width: 920px) {
@@ -2053,6 +2149,10 @@ body {
   .registration-card,
   .registration-card dl {
     grid-template-columns: 1fr;
+  }
+
+  .registration-qr {
+    justify-items: start;
   }
 }
 

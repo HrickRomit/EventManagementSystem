@@ -23,7 +23,8 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(readStoredCart);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [ticketSelection, setTicketSelection] = useState(null);
-  const [message, setMessage] = useState("");
+  const [message, setMessageState] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   useEffect(() => {
     window.localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
@@ -72,7 +73,8 @@ export function CartProvider({ children }) {
       return;
     }
 
-    setMessage("");
+    setMessageState("");
+    setMessageType("");
     setTicketSelection({ event, categoryName: selectedCategory.name });
   };
 
@@ -81,7 +83,7 @@ export function CartProvider({ children }) {
   };
 
   const addTicketToCart = (event, category, quantity) => {
-    const safeQuantity = Math.max(1, Math.min(Number(quantity), Number(category.available)));
+    const safeQuantity = Math.max(1, Math.min(Number(quantity), Number(category.available), 1));
     const cartKey = `${event._id}-${category.name}`;
 
     setCartItems((items) => {
@@ -112,17 +114,40 @@ export function CartProvider({ children }) {
 
     setTicketSelection(null);
     setIsCartOpen(true);
-    setMessage("Ticket added to cart.");
+    setMessageState("Ticket added to cart.");
+    setMessageType("success");
   };
 
   const removeCartItem = (cartKey) => {
     setCartItems((items) => items.filter((item) => item.cartKey !== cartKey));
-    setMessage("");
+    setMessageState("");
+    setMessageType("");
   };
 
   const clearCart = () => {
     setCartItems([]);
-    setMessage("");
+    setMessageState("");
+    setMessageType("");
+  };
+
+  const setMessage = (payload) => {
+    if (!payload) {
+      setMessageState("");
+      setMessageType("");
+      return;
+    }
+
+    if (typeof payload === "string") {
+      setMessageState(payload);
+      setMessageType("success");
+      return;
+    }
+
+    if (typeof payload === "object" && payload !== null) {
+      setMessageState(payload.text || "");
+      setMessageType(payload.type || "");
+      return;
+    }
   };
 
   return (
@@ -133,7 +158,8 @@ export function CartProvider({ children }) {
         cartTotal,
         isCartOpen,
         ticketSelection,
-        message,
+        message: message,
+        messageType: messageType,
         setMessage,
         addTicketToCart,
         clearCart,

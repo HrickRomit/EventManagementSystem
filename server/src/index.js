@@ -1,9 +1,14 @@
 import dotenv from "dotenv";
 import dns from "node:dns";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import app from "./app.js";
 import { connectDB } from "./config/db.js";
 
-dotenv.config({ quiet: true });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+dotenv.config({ path: path.resolve(__dirname, "../.env"), quiet: true });
+dotenv.config({ path: path.resolve(__dirname, ".env.local"), override: true, quiet: true });
 
 if (process.env.DNS_SERVERS) {
   dns.setServers(

@@ -1,7 +1,24 @@
+import { useState } from "react";
 import { useCart } from "../../context/CartContext";
+import { createCheckoutSession } from "../../services/payments";
 
 function CartModal() {
-  const { cartItems, cartTotal, clearCart, closeCart, isCartOpen, message, removeCartItem, setMessage } = useCart();
+  const { cartItems, cartTotal, clearCart, closeCart, isCartOpen, message, messageType, removeCartItem, setMessage } = useCart();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const handleCheckout = async () => {
+    try {
+      setIsCheckingOut(true);
+      setMessage("");
+
+      const { data } = await createCheckoutSession(cartItems);
+      window.location.assign(data.url);
+    } catch (error) {
+      setMessage({ text: error.response?.data?.message || "Could not start Stripe checkout.", type: "error" });
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   if (!isCartOpen) {
     return null;
@@ -15,7 +32,11 @@ function CartModal() {
         </button>
         <p className="dashboard-card-kicker">Cart</p>
         <h2>Your Tickets</h2>
-        {message ? <p className="booking-message booking-message-success">{message}</p> : null}
+        {message ? (
+          <p className={`booking-message ${messageType === "error" ? "booking-message-error" : "booking-message-success"}`}>
+            {message}
+          </p>
+        ) : null}
         {cartItems.length === 0 ? (
           <p className="overview-empty">Your cart is empty.</p>
         ) : (
@@ -39,8 +60,8 @@ function CartModal() {
             </div>
             <div className="cart-popup-total">Cart total: BDT {cartTotal}</div>
             <div className="event-modal-actions">
-              <button type="button" className="nav-button nav-button-primary" onClick={() => setMessage("Checkout flow is ready to connect to payment.")}>
-                Proceed to Checkout
+              <button type="button" className="nav-button nav-button-primary" onClick={handleCheckout} disabled={isCheckingOut}>
+                {isCheckingOut ? "Opening Stripe..." : "Proceed to Checkout"}
               </button>
               <button type="button" className="nav-button nav-button-secondary" onClick={clearCart}>
                 Clear Cart

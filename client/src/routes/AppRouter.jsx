@@ -15,6 +15,8 @@ import CreateEventPage from "../pages/organizer/CreateEventPage";
 import ParticipantDashboardPage from "../pages/participant/ParticipantDashboardPage";
 import ParticipantProfilePage from "../pages/participant/ParticipantProfilePage";
 import MyRegistrationsPage from "../pages/participant/MyRegistrationsPage";
+import PaymentCancelPage from "../pages/payment/PaymentCancelPage";
+import PaymentSuccessPage from "../pages/payment/PaymentSuccessPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import ManageUsersPage from "../pages/admin/ManageUsersPage";
 import ActiveEventsPage from "../pages/admin/ActiveEventsPage";
@@ -26,6 +28,7 @@ function AppRouter() {
       <Route path="/events" element={<EventsPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/how-it-works" element={<HowItWorksPage />} />
+      <Route path="/payment/cancel" element={<PaymentCancelPage />} />
 
       <Route element={<AuthRedirect />}>
         <Route path="/login" element={<LoginPage />} />
@@ -46,6 +49,10 @@ function AppRouter() {
             <Route path="events/new" element={<CreateEventPage />} />
           </Route>
         </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={["participant"]} />}>
+        <Route path="/payment/success" element={<PaymentSuccessPage />} />
       </Route>
 
       <Route path="/admin" element={<AdminRoute />}>

@@ -7,7 +7,8 @@ import {
   getOrganizerEvents,
   getParticipantRegistrations,
   getPublicEvents,
-  updateOrganizerEvent
+  updateOrganizerEvent,
+  verifyTicket
 } from "../controllers/event.controller.js";
 import { requireAuth, requireRole } from "../middleware/auth.middleware.js";
 import { validateRequest } from "../middleware/validate.middleware.js";
@@ -85,6 +86,12 @@ router.post(
 
 router.use(requireAuth, requireRole("organizer"));
 router.get("/mine", getOrganizerEvents);
+router.post(
+  "/tickets/verify",
+  [body("qrPayload").notEmpty().withMessage("QR ticket payload is required.")],
+  validateRequest,
+  verifyTicket
+);
 router.post("/", eventValidation, validateRequest, createEvent);
 router.put("/:id", eventValidation, validateRequest, updateOrganizerEvent);
 router.delete(

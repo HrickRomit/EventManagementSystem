@@ -32,6 +32,7 @@ function MyRegistrationsPage() {
                 <p className="dashboard-card-kicker">{registration.status}</p>
                 <h3>{registration.eventName}</h3>
                 <p>{registration.organizerName}</p>
+                {registration.ticketId ? <p className="registration-ticket-id">Ticket ID: {registration.ticketId}</p> : null}
               </div>
               <dl>
                 <div>
@@ -50,7 +51,29 @@ function MyRegistrationsPage() {
                       : "Registration"}
                   </dd>
                 </div>
+                <div>
+                  <dt>Payment</dt>
+                  <dd>
+                    {registration.paymentStatus === "paid"
+                      ? "Paid"
+                      : registration.paymentStatus === "not_required"
+                        ? "Not required"
+                        : "Pending"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Check-in</dt>
+                  <dd>{registration.attendanceStatus === "checked_in" ? "Checked in" : "Not checked in"}</dd>
+                </div>
               </dl>
+              {registration.qrCodeDataUrl ? (
+                <div className="registration-qr">
+                  <img src={registration.qrCodeDataUrl} alt={`QR code for ticket ${registration.ticketId}`} />
+                  <a href={registration.qrCodeDataUrl} download={`${registration.ticketId || "ticket"}-qr.png`}>
+                    Download QR
+                  </a>
+                </div>
+              ) : null}
             </article>
           ))}
         </div>

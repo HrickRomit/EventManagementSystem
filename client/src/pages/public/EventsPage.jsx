@@ -210,30 +210,6 @@ function EventsPage() {
           discover next.
         </p>
 
-        {publishedEvents.length > 0 ? (
-          <div className="published-event-grid">
-            {publishedEvents.map((event) => (
-              <article key={event._id} className="published-event-card">
-                {event.eventImage ? (
-                  <img className="published-event-image" src={event.eventImage} alt={event.name} />
-                ) : (
-                  <div className="published-event-image published-event-image-empty" />
-                )}
-                <span className="event-card-tag">Published</span>
-                <h2>{event.name}</h2>
-                <p>{new Date(event.date).toLocaleDateString()} at {event.time}</p>
-                {getLowestTicketPrice(event) !== null ? <strong>From BDT {getLowestTicketPrice(event)}</strong> : null}
-                <div className="published-event-actions">
-                  <button type="button" className="event-details-button" onClick={() => setSelectedPublishedEvent(event)}>
-                    Details
-                  </button>
-                  <TicketActions event={event} />
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : null}
-
         <div className="event-card-grid">
           {eventCategories.map((category) =>
             modalEnabledEvents.has(category.name) ? (
@@ -281,6 +257,52 @@ function EventsPage() {
             ),
           )}
         </div>
+
+        {publishedEvents.length > 0 ? (
+          <section className="active-events-section" aria-labelledby="active-events-title">
+            <div className="active-events-heading">
+              <p className="hero-kicker">Currently active</p>
+              <h2 id="active-events-title">Upcoming events you can join.</h2>
+            </div>
+            <div className="event-card-grid active-event-grid">
+              {publishedEvents.map((event) => (
+                <article key={event._id} className="event-card active-event-card">
+                  <span className="event-card-tag">Active</span>
+                  <button
+                    type="button"
+                    className="event-card-media event-card-media-button"
+                    onClick={() => setSelectedPublishedEvent(event)}
+                    aria-label={`Open ${event.name} details`}
+                  >
+                    {event.eventImage ? (
+                      <img src={event.eventImage} alt={event.name} />
+                    ) : (
+                      <span className="active-event-image-empty">{event.eventType || "Event"}</span>
+                    )}
+                  </button>
+                  <h2>{event.name}</h2>
+                  <p>{event.organizerName}</p>
+                  <p>{new Date(event.date).toLocaleDateString()} at {event.time}</p>
+                  {getLowestTicketPrice(event) !== null ? (
+                    <strong className="active-event-price">From BDT {getLowestTicketPrice(event)}</strong>
+                  ) : (
+                    <strong className="active-event-price">{event.entryType}</strong>
+                  )}
+                  <div className="active-event-actions">
+                    <button
+                      type="button"
+                      className="event-card-cta event-card-cta-button"
+                      onClick={() => setSelectedPublishedEvent(event)}
+                    >
+                      Details
+                    </button>
+                    <TicketActions event={event} />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </section>
 
       {selectedEvent ? (

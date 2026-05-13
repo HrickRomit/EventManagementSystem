@@ -62,7 +62,10 @@ function LoginPage() {
 
       const result = await loginUser(values);
       const fallbackPath = roleHomePaths[result.user.role] || "/participant";
-      const redirectPath = location.state?.from?.pathname || fallbackPath;
+      const fromLocation = location.state?.from;
+      const redirectPath = fromLocation
+        ? `${fromLocation.pathname}${fromLocation.search || ""}`
+        : fallbackPath;
       navigate(redirectPath, { replace: true });
     } catch (error) {
       setSubmitError(error.response?.data?.message || "Login failed. Please try again.");
@@ -71,7 +74,10 @@ function LoginPage() {
 
   const goToRoleHome = (result) => {
     const fallbackPath = roleHomePaths[result.user.role] || "/participant";
-    const redirectPath = location.state?.from?.pathname || fallbackPath;
+    const fromLocation = location.state?.from;
+    const redirectPath = fromLocation
+      ? `${fromLocation.pathname}${fromLocation.search || ""}`
+      : fallbackPath;
     navigate(redirectPath, { replace: true });
   };
 

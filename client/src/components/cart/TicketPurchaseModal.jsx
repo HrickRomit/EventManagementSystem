@@ -59,7 +59,7 @@ function TicketPurchaseModal() {
           <input
             type="number"
             min="1"
-            max={selectedCategory?.available || 1}
+            max="1"
             value={quantity}
             onChange={(event) => setQuantity(event.target.value)}
             required
