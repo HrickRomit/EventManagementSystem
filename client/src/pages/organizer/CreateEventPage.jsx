@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createEvent } from "../../services/events";
-import { bangladeshVenues, eventTypes } from "../../data/bangladeshVenues";
+import { eventTypes, getVenuesForEventType } from "../../data/bangladeshVenues";
 
 const ticketCategories = ["premium", "regular", "economy"];
 
@@ -48,9 +48,25 @@ function CreateEventPage() {
   const ticketAvailability = getTicketAvailability(form);
   const hasTicketCapacityError =
     form.entryType === "tickets" && Number(form.capacity || 0) > 0 && ticketAvailability > Number(form.capacity);
+  const venueOptions = getVenuesForEventType(form.eventType);
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleEventTypeChange = (value) => {
+    const nextVenueOptions = getVenuesForEventType(value);
+
+    setForm((current) => {
+      const currentVenueIsAvailable = nextVenueOptions.some((venue) => venue.location === current.venue);
+
+      return {
+        ...current,
+        eventType: value,
+        venue: currentVenueIsAvailable ? current.venue : "",
+        venueEstimate: currentVenueIsAvailable ? current.venueEstimate : ""
+      };
+    });
   };
 
   const updateTicketCategory = (category, field, value) => {
@@ -67,7 +83,7 @@ function CreateEventPage() {
   };
 
   const handleVenueChange = (value) => {
-    const venue = bangladeshVenues.find((item) => item.location === value);
+    const venue = venueOptions.find((item) => item.location === value);
     setForm((current) => ({
       ...current,
       venue: value,
@@ -133,7 +149,7 @@ function CreateEventPage() {
 
           <label className="form-group">
             <span>Event type</span>
-            <select value={form.eventType} onChange={(event) => updateField("eventType", event.target.value)} required>
+            <select value={form.eventType} onChange={(event) => handleEventTypeChange(event.target.value)} required>
               <option value="">Select event type</option>
               {eventTypes.map((type) => (
                 <option key={type} value={type}>
@@ -172,8 +188,8 @@ function CreateEventPage() {
           <label className="form-group">
             <span>Venue location</span>
             <select value={form.venue} onChange={(event) => handleVenueChange(event.target.value)} required>
-              <option value="">Select a Bangladesh location</option>
-              {bangladeshVenues.map((venue) => (
+              <option value="">Select a venue location</option>
+              {venueOptions.map((venue) => (
                 <option key={venue.location} value={venue.location}>
                   {venue.location} - {venue.estimate}
                 </option>

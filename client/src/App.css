@@ -768,7 +768,46 @@ body {
 }
 
 .event-modal.event-details-modal {
+  width: min(92vw, 980px);
+  max-width: calc(100vw - 48px);
+  max-height: calc(100dvh - 48px);
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   border-radius: 28px;
+}
+
+.event-modal.event-details-modal .event-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  left: auto;
+}
+
+.event-modal.event-details-modal .event-modal-content {
+  min-height: 0;
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(300px, 1.15fr);
+  scrollbar-width: thin;
+  scrollbar-color: #7ec7ff rgba(20, 48, 74, 0.14);
+}
+
+.event-modal.event-details-modal .event-modal-visual {
+  min-height: 0;
+  padding: 22px 0 22px 22px;
+}
+
+.event-modal.event-details-modal .event-modal-visual img {
+  max-height: calc(100dvh - 92px);
+}
+
+.event-modal.event-details-modal .event-modal-copy {
+  min-width: 0;
+  justify-content: flex-start;
+  padding: 24px 32px 32px;
+  overflow-wrap: anywhere;
 }
 
 .event-modal.event-details-modal .event-modal-stat {
@@ -2846,8 +2885,20 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .event-modal.event-details-modal .event-modal-content {
+    grid-template-columns: 1fr;
+  }
+
   .event-modal-visual {
     padding: 24px 24px 0;
+  }
+
+  .event-modal.event-details-modal .event-modal-visual {
+    padding: 22px 22px 0;
+  }
+
+  .event-modal.event-details-modal .event-modal-visual img {
+    max-height: 280px;
   }
 
   .event-modal-copy {
@@ -2942,12 +2993,36 @@ body {
     border-radius: 24px;
   }
 
+  .event-modal.event-details-modal {
+    max-width: calc(100vw - 28px);
+    max-height: calc(100dvh - 28px);
+  }
+
+  .event-modal.event-details-modal .event-modal-content {
+    max-height: calc(100dvh - 28px);
+  }
+
+  .event-modal.event-details-modal .event-modal-visual img {
+    max-height: 220px;
+    min-height: 180px;
+  }
+
   .event-modal-close {
     top: 12px;
     left: calc(100% - 58px);
   }
 
+  .event-modal.event-details-modal .event-modal-close {
+    top: 12px;
+    right: 12px;
+    left: auto;
+  }
+
   .event-modal-copy {
+    padding: 18px 20px 24px;
+  }
+
+  .event-modal.event-details-modal .event-modal-copy {
     padding: 18px 20px 24px;
   }
 

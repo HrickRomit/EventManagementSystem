@@ -6,6 +6,7 @@ function EventRegistrationsPage() {
   const [selectedEventId, setSelectedEventId] = useState("");
   const [registrations, setRegistrations] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [ticketStats, setTicketStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -23,6 +24,7 @@ function EventRegistrationsPage() {
     if (!selectedEventId) {
       setRegistrations([]);
       setSelectedEvent(null);
+      setTicketStats(null);
       return;
     }
 
@@ -33,21 +35,25 @@ function EventRegistrationsPage() {
       .then(({ data }) => {
         setSelectedEvent(data.event);
         setRegistrations(data.registrations);
+        setTicketStats(data.stats || null);
       })
       .catch((requestError) => {
         setError(requestError.response?.data?.message || "Could not load registrations.");
         setRegistrations([]);
+        setTicketStats(null);
       })
       .finally(() => setIsLoading(false));
   }, [selectedEventId]);
 
   const totals = useMemo(
     () => ({
-      registered: registrations.length,
-      checkedIn: registrations.filter((registration) => registration.attendanceStatus === "checked_in").length,
-      paid: registrations.filter((registration) => registration.paymentStatus === "paid").length
+      registered: ticketStats?.totalTickets ?? registrations.length,
+      checkedIn:
+        ticketStats?.checkedInTickets ??
+        registrations.filter((registration) => registration.attendanceStatus === "checked_in").length,
+      paid: ticketStats?.paidTickets ?? registrations.filter((registration) => registration.paymentStatus === "paid").length
     }),
-    [registrations]
+    [registrations, ticketStats]
   );
 
   return (
@@ -75,11 +81,11 @@ function EventRegistrationsPage() {
       {selectedEvent ? (
         <div className="stats-grid registration-stats-grid">
           <article className="stat-card">
-            <h3>Total registrations</h3>
+            <h3>Total tickets</h3>
             <p className="stat-value">{totals.registered}</p>
           </article>
           <article className="stat-card">
-            <h3>Checked in</h3>
+            <h3>Tickets checked in</h3>
             <p className="stat-value">{totals.checkedIn}</p>
           </article>
           <article className="stat-card">

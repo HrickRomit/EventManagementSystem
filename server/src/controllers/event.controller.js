@@ -302,7 +302,13 @@ export const getOrganizerEventRegistrations = async (req, res, next) => {
       .populate("participant", "name email phoneNumber")
       .select("-__v");
 
-    return res.json({ event, registrations });
+    const stats = {
+      totalTickets: registrations.length,
+      checkedInTickets: registrations.filter((registration) => registration.attendanceStatus === "checked_in").length,
+      paidTickets: registrations.filter((registration) => registration.paymentStatus === "paid").length
+    };
+
+    return res.json({ event, registrations, stats });
   } catch (error) {
     return next(error);
   }

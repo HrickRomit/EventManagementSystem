@@ -23,3 +23,15 @@ export const bangladeshVenues = [
   { location: "Krishibid Institution Bangladesh Complex, Dhaka", estimate: "BDT 120,000-350,000" },
   { location: "Gulshan Shooting Club Convention Hall, Dhaka", estimate: "BDT 100,000-300,000" }
 ];
+
+export const sportsVenues = [
+  { location: "Pacific Sports Ground", estimate: "4500tk" },
+  { location: "Athletes Hub", estimate: "4000tk" },
+  { location: "Bubbles", estimate: "5000tk" },
+  { location: "Chattoturf", estimate: "4000tk" },
+  { location: "D-Box", estimate: "3500tk" },
+  { location: "DSF", estimate: "3000tk" }
+];
+
+export const getVenuesForEventType = (eventType) =>
+  eventType === "Sports" ? sportsVenues : bangladeshVenues;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { bangladeshVenues, eventTypes } from "../../data/bangladeshVenues";
+import { eventTypes, getVenuesForEventType } from "../../data/bangladeshVenues";
 import { deleteEvent, getOrganizerEvents, updateEvent } from "../../services/events";
 
 const ticketCategories = ["premium", "regular", "economy"];
@@ -104,6 +104,21 @@ function ManageEventsPage() {
     setEditForm((current) => ({ ...current, [field]: value }));
   };
 
+  const handleEventTypeChange = (value) => {
+    const nextVenueOptions = getVenuesForEventType(value);
+
+    setEditForm((current) => {
+      const currentVenueIsAvailable = nextVenueOptions.some((venue) => venue.location === current.venue);
+
+      return {
+        ...current,
+        eventType: value,
+        venue: currentVenueIsAvailable ? current.venue : "",
+        venueEstimate: currentVenueIsAvailable ? current.venueEstimate : ""
+      };
+    });
+  };
+
   const updateTicketCategory = (category, field, value) => {
     setEditForm((current) => ({
       ...current,
@@ -118,7 +133,7 @@ function ManageEventsPage() {
   };
 
   const handleVenueChange = (value) => {
-    const venue = bangladeshVenues.find((item) => item.location === value);
+    const venue = getVenuesForEventType(editForm.eventType).find((item) => item.location === value);
     setEditForm((current) => ({
       ...current,
       venue: value,
@@ -261,7 +276,7 @@ function ManageEventsPage() {
               </label>
               <label className="form-group">
                 <span>Event type</span>
-                <select value={editForm.eventType} onChange={(event) => updateField("eventType", event.target.value)} required>
+                <select value={editForm.eventType} onChange={(event) => handleEventTypeChange(event.target.value)} required>
                   <option value="">Select event type</option>
                   {eventTypes.map((type) => (
                     <option key={type} value={type}>
@@ -294,7 +309,8 @@ function ManageEventsPage() {
               <label className="form-group">
                 <span>Venue location</span>
                 <select value={editForm.venue} onChange={(event) => handleVenueChange(event.target.value)} required>
-                  {bangladeshVenues.map((venue) => (
+                  <option value="">Select a venue location</option>
+                  {getVenuesForEventType(editForm.eventType).map((venue) => (
                     <option key={venue.location} value={venue.location}>
                       {venue.location} - {venue.estimate}
                     </option>
