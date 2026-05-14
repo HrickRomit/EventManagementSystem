@@ -3151,6 +3151,24 @@ textarea {
   color: #ffffff;
 }
 
+.walkthrough-toggle-button {
+  color: #eaf6ff;
+}
+
+.walkthrough-toggle-button span {
+  color: #9fdcff;
+}
+
+.walkthrough-toggle-button:hover {
+  color: #ffffff;
+  background: rgba(78, 111, 143, 0.32);
+}
+
+.walkthrough-toggle-active,
+.walkthrough-toggle-active span {
+  color: #ffffff;
+}
+
 .nav-button,
 .cart-nav-button,
 .cart-floating-button,
