@@ -3394,6 +3394,10 @@ textarea {
   color: var(--muted);
 }
 
+.event-modal-stat span {
+  color: #ffffff;
+}
+
 .event-card-tag {
   background: rgba(132, 190, 234, 0.15);
   border: 1px solid rgba(176, 221, 255, 0.18);
