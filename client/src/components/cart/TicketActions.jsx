@@ -4,9 +4,9 @@ import { useAuth } from "../../context/AuthContext";
 import { bookEvent } from "../../services/events";
 
 function TicketActions({ event }) {
-  const { openTicketSelector } = useCart();
+  const { openCart, openTicketSelector, setMessage } = useCart();
   const { user } = useAuth();
-  const [message, setMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
 
   if (event.entryType === "registration") {
@@ -14,17 +14,18 @@ function TicketActions({ event }) {
 
     const handleRegister = async () => {
       if (!user || user.role !== "participant") {
-        setMessage("Log in as a participant to register.");
+        setMessage({ text: "Log in as a participant to register.", type: "error" });
+        openCart();
         return;
       }
 
       try {
         setIsRegistering(true);
-        setMessage("");
+        setStatusMessage("");
         await bookEvent(event._id);
-        setMessage("Registered.");
+        setStatusMessage("Registered.");
       } catch (requestError) {
-        setMessage(requestError.response?.data?.message || "Could not register for this event.");
+        setStatusMessage(requestError.response?.data?.message || "Could not register for this event.");
       } finally {
         setIsRegistering(false);
       }
@@ -40,7 +41,7 @@ function TicketActions({ event }) {
         >
           {isRegistering ? "Registering..." : canRegister ? "Register" : "Full"}
         </button>
-        {message ? <span className="ticket-action-message">{message}</span> : null}
+        {statusMessage ? <span className="ticket-action-message">{statusMessage}</span> : null}
       </div>
     );
   }
