@@ -129,12 +129,17 @@ registrationSchema.index({ ticketId: 1 }, { unique: true, sparse: true });
 const Registration = mongoose.model("Registration", registrationSchema);
 
 export const ensureRegistrationIndexes = async () => {
-  try {
+  const indexes = await Registration.collection.indexes();
+  const hasIndex = (name) => indexes.some((index) => index.name === name);
+
+  if (hasIndex("participant_1_event_1")) {
     await Registration.collection.dropIndex("participant_1_event_1");
-  } catch (error) {
-    if (error.codeName !== "IndexNotFound" && error.code !== 27) {
-      throw error;
-    }
+  }
+
+  const ticketIdIndex = indexes.find((index) => index.name === "ticketId_1");
+
+  if (ticketIdIndex && ticketIdIndex.sparse !== true) {
+    await Registration.collection.dropIndex("ticketId_1");
   }
 
   await Registration.createIndexes();
