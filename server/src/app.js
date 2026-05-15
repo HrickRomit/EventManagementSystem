@@ -14,11 +14,12 @@ const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
   .filter(Boolean);
 const isDevelopment = process.env.NODE_ENV !== "production";
 const isLocalDevOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+const isVercelDomain = (origin) => /^https:\/\/.*\.vercel\.app$/.test(origin);
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin) || (isDevelopment && isLocalDevOrigin(origin))) {
+      if (!origin || allowedOrigins.includes(origin) || (isDevelopment && isLocalDevOrigin(origin)) || isVercelDomain(origin)) {
         callback(null, true);
         return;
       }
